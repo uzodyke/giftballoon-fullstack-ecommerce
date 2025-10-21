@@ -1,0 +1,441 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProductCard from '@/components/ProductCard.astro';
+import { products } from '@/data/products';
+
+// SEO Schema for Homepage
+const homepageSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Gifted Balloon",
+  "url": "https://giftedballoon.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://giftedballoon.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Gifted Balloon",
+    "logo": "https://giftedballoon.com/logo.png"
+  }
+};
+
+// Featured products for hero section
+const featuredProducts = [products[1], products[7]]; // Luxury and Golden Treasure
+---
+
+<BaseLayout
+  title="Personalised Balloons | Custom Balloon Bouquets UK | Gifted Balloon"
+  description="Create personalised balloon bouquets for any occasion. Custom balloons, giant balloon bouquets, and personalised gifts delivered across the UK. Order online today!"
+  ogImage="/images/5. Love bouquet_£30.png"
+  schema={homepageSchema}
+  keywords="personalised balloons, custom balloons, balloon bouquet, giant balloon bouquet, large balloon bouquet, personalised balloons near me, balloon delivery UK"
+>
+  <!-- Hero Section -->
+  <section class="hero bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100 py-20" role="banner">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Hero Content -->
+        <div class="space-y-8 animate-fade-in">
+          <div class="space-y-4">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-900 leading-tight">
+              Personalised Balloons for
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-primary-600">
+                Every Occasion
+              </span>
+            </h1>
+            <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+              Create magical moments with our custom balloon bouquets. Personalised with names, occasions, and delivered fresh across the UK.
+            </p>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a
+              href="/shop"
+              class="cta-button bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-center"
+            >
+              Shop Personalised Balloons
+            </a>
+            <a
+              href="/services/weddings"
+              class="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 text-center"
+            >
+              Explore Services
+            </a>
+          </div>
+
+          <!-- Trust Badges -->
+          <div class="flex flex-wrap gap-6 text-sm text-gray-600">
+            <div class="flex items-center gap-2">
+              <span class="text-green-500">✓</span>
+              <span>UK-Wide Delivery</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-green-500">✓</span>
+              <span>Same Day Available</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-green-500">✓</span>
+              <span>5-Star Service</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Image -->
+        <div class="relative animate-slide-up">
+          <div class="relative">
+            <!-- Main Hero Image with full visibility -->
+            <div class="bg-white p-8 rounded-3xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
+              <img
+                src="/images/5. Love bouquet_£30.png"
+                alt="Personalised Love Balloon Bouquet"
+                class="w-full h-96 object-contain rounded-2xl"
+                loading="eager"
+                width="400"
+                height="400"
+              />
+            </div>
+
+            <!-- Floating badges -->
+            <div class="absolute -top-4 -left-4 bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-bounce-slow">
+              From £25
+            </div>
+            <div class="absolute -bottom-4 -right-4 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse-slow">
+              Same Day UK
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <section class="py-16 bg-white" aria-labelledby="featured-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 id="featured-heading" class="text-3xl md:text-4xl font-bold text-gray-900">
+          Featured Balloon Collections
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Discover our most popular balloon arrangements, each designed to create unforgettable moments
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
+        {featuredProducts.map((product, index) => (
+          <div class="group bg-gradient-to-br from-pink-50 to-purple-50 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+            <div class="flex flex-col lg:flex-row items-center gap-8">
+              <!-- Product Image with full visibility and curved border -->
+              <div class="flex-shrink-0">
+                <div class="relative">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    class="w-64 h-64 object-contain rounded-2xl bg-white p-4 shadow-lg group-hover:shadow-xl transition-shadow duration-300"
+                    loading="lazy"
+                    width="256"
+                    height="256"
+                  />
+                  <div class="absolute -top-2 -right-2 bg-primary-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                    £{product.price.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Product Info -->
+              <div class="space-y-4 text-center lg:text-left">
+                <h3 class="text-2xl font-bold text-gray-900">{product.name}</h3>
+                <p class="text-gray-600 leading-relaxed">{product.description}</p>
+                <div class="flex flex-wrap gap-2 justify-center lg:justify-start">
+                  {product.features.slice(0, 3).map(feature => (
+                    <span class="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+                <a
+                  href={`/shop?product=${product.id}`}
+                  class="inline-block bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200"
+                >
+                  Customize Now
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Catalog Section -->
+  <section class="py-16 bg-gray-50" aria-labelledby="catalog-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 id="catalog-heading" class="text-3xl md:text-4xl font-bold text-gray-900">
+          Our Personalised Balloon Collection
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Browse our complete range of personalised balloons, each one crafted to perfection and ready for your custom touch
+        </p>
+      </div>
+
+      <!-- Product Grid with Full Image Display -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {products.map((product, index) => (
+          <ProductCard
+            product={product}
+            loading={index < 4 ? 'eager' : 'lazy'}
+            showFullImage={true}
+          />
+        ))}
+      </div>
+
+      <!-- View All Button -->
+      <div class="text-center mt-12">
+        <a
+          href="/shop"
+          class="inline-block bg-primary-500 hover:bg-primary-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+        >
+          View All Products & Customize
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Preview -->
+  <section class="py-16 bg-white" aria-labelledby="services-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 id="services-heading" class="text-3xl md:text-4xl font-bold text-gray-900">
+          Special Occasion Services
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Tailored balloon arrangements for life's most important moments
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <a href="/services/weddings" class="group text-center space-y-4 p-6 rounded-2xl hover:bg-pink-50 transition-colors duration-200">
+          <div class="text-6xl group-hover:scale-110 transition-transform duration-200">💒</div>
+          <h3 class="text-xl font-bold text-gray-900">Weddings</h3>
+          <p class="text-gray-600">Romantic balloon arrangements for your special day</p>
+        </a>
+
+        <a href="/services/corporate-events" class="group text-center space-y-4 p-6 rounded-2xl hover:bg-blue-50 transition-colors duration-200">
+          <div class="text-6xl group-hover:scale-110 transition-transform duration-200">🏢</div>
+          <h3 class="text-xl font-bold text-gray-900">Corporate Events</h3>
+          <p class="text-gray-600">Professional displays for business celebrations</p>
+        </a>
+
+        <a href="/services/birthdays" class="group text-center space-y-4 p-6 rounded-2xl hover:bg-yellow-50 transition-colors duration-200">
+          <div class="text-6xl group-hover:scale-110 transition-transform duration-200">🎂</div>
+          <h3 class="text-xl font-bold text-gray-900">Birthdays</h3>
+          <p class="text-gray-600">Fun celebrations for all ages</p>
+        </a>
+
+        <a href="/services/graduations" class="group text-center space-y-4 p-6 rounded-2xl hover:bg-green-50 transition-colors duration-200">
+          <div class="text-6xl group-hover:scale-110 transition-transform duration-200">🎓</div>
+          <h3 class="text-xl font-bold text-gray-900">Graduations</h3>
+          <p class="text-gray-600">Celebrate academic achievements</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Location Services -->
+  <section class="py-16 bg-gradient-to-r from-primary-500 to-primary-600 text-white" aria-labelledby="locations-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 id="locations-heading" class="text-3xl md:text-4xl font-bold">
+          UK-Wide Delivery Network
+        </h2>
+        <p class="text-xl opacity-90 max-w-3xl mx-auto">
+          From London to Edinburgh, we deliver personalised balloons across the entire United Kingdom
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <a href="/locations/london" class="group space-y-2 p-4 rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
+          <div class="text-3xl">🏛️</div>
+          <h3 class="font-bold">London</h3>
+          <p class="text-sm opacity-80">Same Day</p>
+        </a>
+
+        <a href="/locations/manchester" class="group space-y-2 p-4 rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
+          <div class="text-3xl">⚽</div>
+          <h3 class="font-bold">Manchester</h3>
+          <p class="text-sm opacity-80">Next Day</p>
+        </a>
+
+        <a href="/locations/birmingham" class="group space-y-2 p-4 rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
+          <div class="text-3xl">🏭</div>
+          <h3 class="font-bold">Birmingham</h3>
+          <p class="text-sm opacity-80">Next Day</p>
+        </a>
+
+        <a href="/locations/coventry" class="group space-y-2 p-4 rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
+          <div class="text-3xl">🎭</div>
+          <h3 class="font-bold">Coventry</h3>
+          <p class="text-sm opacity-80">Fast Delivery</p>
+        </a>
+      </div>
+
+      <div class="text-center mt-8">
+        <a
+          href="/locations/london"
+          class="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors duration-200"
+        >
+          View All Locations
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-16 bg-gray-50" aria-labelledby="features-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 id="features-heading" class="text-3xl md:text-4xl font-bold text-gray-900">
+          Why Choose Gifted Balloon?
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="text-center space-y-4 p-6 bg-white rounded-2xl shadow-lg">
+          <div class="text-4xl">🎨</div>
+          <h3 class="text-xl font-bold text-gray-900">Fully Personalised</h3>
+          <p class="text-gray-600">Add custom names, messages, and choose from various themes</p>
+        </div>
+
+        <div class="text-center space-y-4 p-6 bg-white rounded-2xl shadow-lg">
+          <div class="text-4xl">🚚</div>
+          <h3 class="text-xl font-bold text-gray-900">UK-Wide Delivery</h3>
+          <p class="text-gray-600">Fast delivery to all major UK cities and towns</p>
+        </div>
+
+        <div class="text-center space-y-4 p-6 bg-white rounded-2xl shadow-lg">
+          <div class="text-4xl">🎁</div>
+          <h3 class="text-xl font-bold text-gray-900">Premium Quality</h3>
+          <p class="text-gray-600">High-quality balloons and materials for lasting memories</p>
+        </div>
+
+        <div class="text-center space-y-4 p-6 bg-white rounded-2xl shadow-lg">
+          <div class="text-4xl">📅</div>
+          <h3 class="text-xl font-bold text-gray-900">Flexible Dates</h3>
+          <p class="text-gray-600">Choose your preferred delivery date with our calendar picker</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-16 bg-white" aria-labelledby="faq-heading">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 id="faq-heading" class="text-3xl md:text-4xl font-bold text-gray-900">
+          Frequently Asked Questions
+        </h2>
+      </div>
+
+      <div class="space-y-6">
+        <details class="group bg-gray-50 rounded-lg p-6">
+          <summary class="cursor-pointer font-semibold text-lg text-gray-900 flex justify-between items-center">
+            How long does delivery take?
+            <span class="group-open:rotate-180 transition-transform duration-200">↓</span>
+          </summary>
+          <p class="mt-4 text-gray-600 leading-relaxed">
+            We offer same-day delivery in London and next-day delivery to most UK cities. Standard delivery takes 2-3 business days. Express options are available for urgent orders.
+          </p>
+        </details>
+
+        <details class="group bg-gray-50 rounded-lg p-6">
+          <summary class="cursor-pointer font-semibold text-lg text-gray-900 flex justify-between items-center">
+            Can I personalize my balloon with any text?
+            <span class="group-open:rotate-180 transition-transform duration-200">↓</span>
+          </summary>
+          <p class="mt-4 text-gray-600 leading-relaxed">
+            Yes! You can add any personalized text up to 30 characters. We use professional vinyl lettering to ensure your message looks perfect.
+          </p>
+        </details>
+
+        <details class="group bg-gray-50 rounded-lg p-6">
+          <summary class="cursor-pointer font-semibold text-lg text-gray-900 flex justify-between items-center">
+            Do you deliver to all UK locations?
+            <span class="group-open:rotate-180 transition-transform duration-200">↓</span>
+          </summary>
+          <p class="mt-4 text-gray-600 leading-relaxed">
+            We deliver to all major UK cities and most towns. Our network covers England, Scotland, Wales, and Northern Ireland. Check our locations page for specific areas.
+          </p>
+        </details>
+      </div>
+
+      <div class="text-center mt-8">
+        <a
+          href="/faq"
+          class="inline-block text-primary-600 hover:text-primary-700 font-semibold"
+        >
+          View All FAQs →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">
+        Ready to Create Something Special?
+      </h2>
+      <p class="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
+        Start personalizing your balloon bouquet today and make your celebration unforgettable
+      </p>
+      <a
+        href="/shop"
+        class="inline-block bg-white text-primary-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors duration-200 shadow-lg"
+      >
+        Start Customizing Now
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .animate-fade-in {
+    animation: fadeIn 1s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 1s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Ensure product images show full content */
+  .product-grid img {
+    border-radius: 1rem;
+    padding: 1rem;
+    background: white;
+  }
+</style>

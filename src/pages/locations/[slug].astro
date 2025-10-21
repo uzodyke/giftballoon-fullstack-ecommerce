@@ -1,0 +1,430 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import ProductCard from '@/components/ProductCard.astro';
+import { locations, getLocationBySlug, getAllLocationSlugs } from '@/data/locations';
+import { products } from '@/data/products';
+
+export async function getStaticPaths() {
+  return getAllLocationSlugs().map(slug => ({
+    params: { slug }
+  }));
+}
+
+const { slug } = Astro.params;
+const location = getLocationBySlug(slug!);
+
+if (!location) {
+  return Astro.redirect('/404');
+}
+
+// Get location-specific products
+const locationProducts = location.popularProducts.map(id => products.find(p => p.id === id)).filter(Boolean);
+
+// Location-specific schema
+const locationSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": `Gifted Balloon ${location.name}`,
+  "description": location.description,
+  "url": `https://giftedballoon.com/locations/${location.slug}`,
+  "telephone": "+447459665002",
+  "email": `${location.slug}@giftedballoon.com`,
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": location.name,
+    "addressRegion": location.region,
+    "addressCountry": "GB"
+  },
+  "serviceArea": [
+    {
+      "@type": "City",
+      "name": location.name
+    },
+    {
+      "@type": "Place",
+      "name": location.region
+    }
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": `${location.name} Balloon Delivery Services`,
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": `${location.deliveryTime} Balloon Delivery ${location.name}`,
+          "description": `${location.deliveryTime} personalised balloon delivery across ${location.name}`
+        }
+      }
+    ]
+  },
+  "areaServed": location.postcodes.map(postcode => ({
+    "@type": "PostalCode",
+    "name": postcode
+  })),
+  "openingHours": "Mo-Su 09:00-20:00",
+  "priceRange": "£25-£45"
+};
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Locations', href: '/locations/london' },
+  { label: `${location.name} Balloons` }
+];
+---
+
+<BaseLayout
+  title={location.seoTitle}
+  description={location.seoDescription}
+  ogImage="/images/5. Love bouquet_£30.png"
+  schema={locationSchema}
+  keywords={`personalised balloons ${location.name}, balloon delivery ${location.name}, custom balloons ${location.name}, balloon bouquet ${location.name}`}
+  location={location.slug}
+>
+  <!-- Breadcrumb -->
+  <Breadcrumb items={breadcrumbItems} />
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Location Content -->
+        <div class="space-y-8">
+          <div class="space-y-4">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+              Personalised Balloons {location.name}
+            </h1>
+            <h2 class="text-2xl font-semibold text-primary-600">
+              {location.deliveryTime} Delivery Across {location.region}
+            </h2>
+            <p class="text-xl text-gray-600 leading-relaxed">
+              {location.description}
+            </p>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a
+              href="/shop"
+              class="bg-primary-500 hover:bg-primary-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200 text-center"
+            >
+              Order Now
+            </a>
+            <a
+              href="tel:+447459665002"
+              class="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200 text-center"
+            >
+              Call Us
+            </a>
+          </div>
+
+          <!-- Special Features -->
+          <div class="flex flex-wrap gap-4">
+            {location.specialFeatures.map((feature) => (
+              <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                <span class="text-green-500">✓</span>
+                {feature}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <!-- Location Image with curved border -->
+        <div class="relative">
+          <div class="bg-white p-8 rounded-3xl shadow-2xl">
+            <img
+              src="/images/8.Golden Treasure Stuffed Balloon_£35.png"
+              alt={`${location.name} Balloon Delivery`}
+              class="w-full h-96 object-contain rounded-2xl"
+              loading="eager"
+              width="400"
+              height="400"
+            />
+          </div>
+
+          <!-- Floating badges -->
+          <div class="absolute -top-4 -left-4 bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+            {location.deliveryTime}
+          </div>
+          <div class="absolute -bottom-4 -right-4 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+            All {location.name} Areas
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Service Areas -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
+          We Deliver Across {location.region}
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Professional balloon delivery to all areas of {location.name} and surrounding regions
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Landmarks -->
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl">
+          <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            🏛️ Key Areas
+          </h3>
+          <ul class="space-y-2">
+            {location.landmarks.map((landmark) => (
+              <li class="text-gray-700 flex items-center gap-2">
+                <span class="text-blue-500">•</span>
+                {landmark}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Universities -->
+        {location.universities.length > 0 && (
+          <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl">
+            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              🎓 Universities
+            </h3>
+            <ul class="space-y-2">
+              {location.universities.map((university) => (
+                <li class="text-gray-700 flex items-center gap-2">
+                  <span class="text-green-500">•</span>
+                  {university}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <!-- Business Areas -->
+        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl">
+          <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            🏢 Business Districts
+          </h3>
+          <ul class="space-y-2">
+            {location.businessAreas.map((area) => (
+              <li class="text-gray-700 flex items-center gap-2">
+                <span class="text-purple-500">•</span>
+                {area}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Postcodes -->
+      <div class="mt-12 text-center">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          Postcode Coverage: {location.postcodes.join(', ')}
+        </h3>
+        <p class="text-gray-600">
+          We deliver to all {location.postcodes.join(', ')} postcode areas in {location.name}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Products for This Location -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
+          Popular Balloon Choices in {location.name}
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          These balloon designs are especially popular with our {location.name} customers
+        </p>
+      </div>
+
+      <div class="space-y-12">
+        {locationProducts.map((product, index) => (
+          product && (
+            <div class="grid lg:grid-cols-2 gap-8 items-center bg-white rounded-3xl p-8 shadow-lg" class:list={[index % 2 === 1 && 'lg:grid-cols-2']}>
+              <!-- Product Image with full visibility -->
+              <div class={`${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                <div class="bg-gradient-to-br from-pink-50 to-purple-50 p-6 rounded-2xl">
+                  <img
+                    src={product.image}
+                    alt={`${product.name} ${location.name}`}
+                    class="w-full h-80 object-contain rounded-xl"
+                    loading="lazy"
+                    width="400"
+                    height="320"
+                  />
+                </div>
+              </div>
+
+              <!-- Product Info -->
+              <div class={`space-y-6 ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                <div>
+                  <h3 class="text-2xl font-bold text-gray-900 mb-2">{product.name}</h3>
+                  <p class="text-lg text-primary-600 font-semibold mb-4">From £{product.price.toFixed(2)}</p>
+                  <p class="text-gray-600 leading-relaxed">{product.description}</p>
+                </div>
+
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-2">Perfect for {location.name}:</h4>
+                  <div class="flex flex-wrap gap-2">
+                    {product.occasions.slice(0, 3).map(occasion => (
+                      <span class="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {occasion}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <a
+                  href={`/shop?product=${product.id}`}
+                  class="inline-block bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200"
+                >
+                  Customize Now
+                </a>
+              </div>
+            </div>
+          )
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Location-Specific Features -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
+          Why Choose Us for {location.name} Balloon Delivery?
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {location.specialFeatures.map((feature, index) => (
+          <div class="text-center space-y-4 p-6 bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl">
+            <div class="text-4xl">
+              {index === 0 ? '🚚' : index === 1 ? '📍' : index === 2 ? '⭐' : '🎯'}
+            </div>
+            <h3 class="text-lg font-bold text-gray-900">{feature}</h3>
+            <p class="text-gray-600 text-sm">
+              Professional {feature.toLowerCase()} service across {location.name}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Local FAQ -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
+          {location.name} Balloon Delivery FAQ
+        </h2>
+        <p class="text-xl text-gray-600">
+          Common questions about our {location.name} balloon delivery service
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <details class="group bg-white rounded-lg p-6 shadow-lg">
+          <summary class="cursor-pointer font-semibold text-lg text-gray-900 flex justify-between items-center">
+            Do you deliver to all {location.name} areas?
+            <span class="group-open:rotate-180 transition-transform duration-200">↓</span>
+          </summary>
+          <p class="mt-4 text-gray-600 leading-relaxed">
+            Yes! We deliver to all {location.name} postcodes ({location.postcodes.join(', ')}) and the wider {location.region} area. Our experienced local drivers know every area of {location.name}.
+          </p>
+        </details>
+
+        <details class="group bg-white rounded-lg p-6 shadow-lg">
+          <summary class="cursor-pointer font-semibold text-lg text-gray-900 flex justify-between items-center">
+            What's the delivery cost in {location.name}?
+            <span class="group-open:rotate-180 transition-transform duration-200">↓</span>
+          </summary>
+          <p class="mt-4 text-gray-600 leading-relaxed">
+            Standard {location.name} delivery is £5.99. Free delivery on orders over £50. {location.deliveryTime.includes('Same') ? 'Same-day' : 'Express'} delivery available for £9.99.
+          </p>
+        </details>
+
+        {location.universities.length > 0 && (
+          <details class="group bg-white rounded-lg p-6 shadow-lg">
+            <summary class="cursor-pointer font-semibold text-lg text-gray-900 flex justify-between items-center">
+              Can you deliver to {location.name} universities?
+              <span class="group-open:rotate-180 transition-transform duration-200">↓</span>
+            </summary>
+            <p class="mt-4 text-gray-600 leading-relaxed">
+              Absolutely! We regularly deliver to {location.universities.join(', ')} and all student accommodations across {location.name}.
+            </p>
+          </details>
+        )}
+
+        <details class="group bg-white rounded-lg p-6 shadow-lg">
+          <summary class="cursor-pointer font-semibold text-lg text-gray-900 flex justify-between items-center">
+            What's your {location.name} delivery schedule?
+            <span class="group-open:rotate-180 transition-transform duration-200">↓</span>
+          </summary>
+          <p class="mt-4 text-gray-600 leading-relaxed">
+            {location.deliveryTime} delivery for orders placed before 3PM. We offer morning (9AM-12PM) and afternoon (1PM-6PM) delivery slots across {location.name}.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Other Locations -->
+  <section class="py-16 bg-primary-500 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold">
+          Other UK Cities We Serve
+        </h2>
+        <p class="text-xl opacity-90">
+          Personalised balloon delivery across the United Kingdom
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {locations.filter(l => l.id !== location.id).slice(0, 8).map((otherLocation) => (
+          <a
+            href={`/locations/${otherLocation.slug}`}
+            class="block text-center p-4 bg-white bg-opacity-10 rounded-lg hover:bg-opacity-20 transition-all duration-200"
+          >
+            <h3 class="font-bold">{otherLocation.name}</h3>
+            <p class="text-sm opacity-80">{otherLocation.deliveryTime}</p>
+          </a>
+        ))}
+      </div>
+
+      <div class="text-center mt-8">
+        <a
+          href="/locations/london"
+          class="inline-block bg-white text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
+        >
+          View All Locations
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        Ready to Send Personalised Balloons in {location.name}?
+      </h2>
+      <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+        Create your custom balloon bouquet and we'll deliver it across {location.region}!
+      </p>
+      <a
+        href="/shop"
+        class="inline-block bg-primary-500 hover:bg-primary-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200 shadow-lg"
+      >
+        Start Customizing Your {location.name} Balloon
+      </a>
+    </div>
+  </section>
+</BaseLayout>

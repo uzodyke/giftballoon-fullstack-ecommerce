@@ -1,0 +1,364 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+
+// FAQ data with comprehensive questions
+const faqCategories = [
+  {
+    category: "Ordering & Customization",
+    questions: [
+      {
+        question: "How do I personalize my balloon?",
+        answer: "You can add any custom text up to 30 characters using our online customization tool. We use professional vinyl lettering to ensure your message looks perfect. Choose from various fonts and colors to match your occasion."
+      },
+      {
+        question: "What occasions can I customize balloons for?",
+        answer: "We cater to all occasions including weddings, birthdays, anniversaries, Valentine's Day, Christmas, Mother's Day, Father's Day, corporate events, graduations, baby showers, and more. If you have a special occasion not listed, select 'Others' and describe your needs."
+      },
+      {
+        question: "Can I change my order after placing it?",
+        answer: "You can modify your order within 2 hours of placement by contacting our customer service. After this time, we may have already started preparing your balloon, making changes difficult."
+      },
+      {
+        question: "Do you offer bulk discounts for large orders?",
+        answer: "Yes! We offer competitive pricing for orders of 10 or more balloons. Contact us directly for a custom quote for corporate events, weddings, or large celebrations."
+      }
+    ]
+  },
+  {
+    category: "Delivery & Shipping",
+    questions: [
+      {
+        question: "What are your delivery times?",
+        answer: "We offer same-day delivery in London (order before 2PM), next-day delivery to major UK cities, and standard 2-3 business day delivery nationwide. Express options available for urgent orders."
+      },
+      {
+        question: "Do you deliver to all UK locations?",
+        answer: "Yes! We deliver to all major UK cities and most towns across England, Scotland, Wales, and Northern Ireland. Check our locations page for specific areas and delivery times."
+      },
+      {
+        question: "What are your delivery charges?",
+        answer: "Standard delivery is £5.99. Same-day London delivery is £9.99. Next-day express delivery is £9.99. Free delivery on all orders over £50. Weekend deliveries available with additional charges."
+      },
+      {
+        question: "Can you deliver to specific times?",
+        answer: "We offer morning (9AM-12PM) and afternoon (1PM-6PM) delivery slots. For special events, we can arrange specific delivery times with advance notice."
+      },
+      {
+        question: "Do you deliver to universities and offices?",
+        answer: "Absolutely! We regularly deliver to universities, offices, hotels, and event venues across the UK. We're experienced in navigating campus and corporate building deliveries."
+      }
+    ]
+  },
+  {
+    category: "Products & Quality",
+    questions: [
+      {
+        question: "What materials are your balloons made from?",
+        answer: "We use premium foil and latex balloons from certified suppliers. All balloons are helium-quality and designed for longevity. We also offer biodegradable options for environmentally conscious customers."
+      },
+      {
+        question: "How long do the balloons last?",
+        answer: "Foil balloons typically float for 5-7 days. Latex balloons last 8-12 hours floating. All balloons come with care instructions to maximize their lifespan."
+      },
+      {
+        question: "What if my balloon arrives damaged?",
+        answer: "We have a 100% satisfaction guarantee. If your balloon arrives damaged or deflated, contact us immediately for a free replacement or full refund."
+      },
+      {
+        question: "Are your balloons suitable for outdoor use?",
+        answer: "Yes, but we recommend securing them against wind and avoiding extreme temperatures. We provide weights and ribbons to help anchor your balloons safely."
+      }
+    ]
+  },
+  {
+    category: "Payment & Pricing",
+    questions: [
+      {
+        question: "What payment methods do you accept?",
+        answer: "We accept all major credit cards (Visa, Mastercard, American Express), PayPal, Apple Pay, and Google Pay. All transactions are secured with SSL encryption."
+      },
+      {
+        question: "Are there any hidden fees?",
+        answer: "No hidden fees! Our prices include VAT. The only additional costs are delivery charges (unless you qualify for free delivery) and any optional upgrades you choose."
+      },
+      {
+        question: "Do you offer refunds?",
+        answer: "Yes, we offer full refunds for cancellations made at least 24 hours before your scheduled delivery time. Custom balloons are non-refundable once production has started."
+      },
+      {
+        question: "Can I get a quote before ordering?",
+        answer: "Absolutely! Use our online calculator for instant pricing, or contact us for custom quotes on bulk orders or special requirements."
+      }
+    ]
+  },
+  {
+    category: "Special Services",
+    questions: [
+      {
+        question: "Do you offer setup services for events?",
+        answer: "Yes! We provide professional setup services for weddings, corporate events, and large celebrations. Our team can arrange balloon displays, arches, and centerpieces."
+      },
+      {
+        question: "Can you match specific colors or themes?",
+        answer: "Absolutely! We can match wedding colors, corporate branding, or specific theme requirements. Contact us with your color specifications or theme details."
+      },
+      {
+        question: "Do you provide balloons for photo shoots?",
+        answer: "Yes, we work with photographers, event planners, and marketing agencies for commercial photo shoots and promotional events. Contact us for media rates."
+      },
+      {
+        question: "Can you create custom shapes or designs?",
+        answer: "We specialize in standard balloon shapes with custom text and colors. For unique shapes or complex designs, contact us to discuss custom manufacturing options."
+      }
+    ]
+  }
+];
+
+// FAQ Schema
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqCategories.flatMap(category =>
+    category.questions.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  )
+};
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Frequently Asked Questions' }
+];
+---
+
+<BaseLayout
+  title="FAQ - Frequently Asked Questions | Gifted Balloon"
+  description="Find answers to common questions about our personalised balloon services, delivery, customization, and more. Get help with your balloon orders."
+  ogImage="/images/5. Love bouquet_£30.png"
+  schema={faqSchema}
+  keywords="balloon FAQ, personalised balloon questions, delivery information, balloon customization help, UK balloon delivery"
+>
+  <!-- Breadcrumb -->
+  <Breadcrumb items={breadcrumbItems} />
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100 py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        Frequently Asked Questions
+      </h1>
+      <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
+        Find answers to common questions about our personalised balloon services, delivery options, and customization process.
+      </p>
+    </div>
+  </section>
+
+  <!-- Quick Links -->
+  <section class="py-8 bg-white border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Jump to Section:</h2>
+        <div class="flex flex-wrap justify-center gap-4">
+          {faqCategories.map((category, index) => (
+            <a
+              href={`#category-${index}`}
+              class="bg-primary-100 text-primary-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-primary-200 transition-colors"
+            >
+              {category.category}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Content -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="space-y-12">
+        {faqCategories.map((category, categoryIndex) => (
+          <div id={`category-${categoryIndex}`} class="space-y-6">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 border-b-2 border-primary-500 pb-4">
+              {category.category}
+            </h2>
+
+            <div class="space-y-4">
+              {category.questions.map((faq, questionIndex) => (
+                <details class="group bg-white rounded-xl shadow-lg overflow-hidden">
+                  <summary class="cursor-pointer p-6 font-semibold text-lg text-gray-900 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                    <span class="pr-4">{faq.question}</span>
+                    <svg
+                      class="w-6 h-6 text-primary-500 group-open:rotate-180 transition-transform duration-200 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <div class="px-6 pb-6">
+                    <p class="text-gray-600 leading-relaxed text-base">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Support -->
+  <section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-8 text-white">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4">
+          Still Have Questions?
+        </h2>
+        <p class="text-xl opacity-90 mb-6 max-w-2xl mx-auto">
+          Our friendly customer service team is here to help with any questions about your personalised balloon order.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/contact"
+            class="bg-white text-primary-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+          >
+            Contact Us
+          </a>
+          <a
+            href="tel:+447459665002"
+            class="border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-3 rounded-lg font-bold transition-colors"
+          >
+            Call Now
+          </a>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="mt-8 pt-8 border-t border-white border-opacity-20">
+          <div class="grid md:grid-cols-3 gap-6 text-center">
+            <div>
+              <div class="text-2xl mb-2">📧</div>
+              <h3 class="font-semibold mb-1">Email Support</h3>
+              <p class="opacity-90">info@giftedballoon.com</p>
+            </div>
+            <div>
+              <div class="text-2xl mb-2">📞</div>
+              <h3 class="font-semibold mb-1">Phone Support</h3>
+              <p class="opacity-90">+44 7459 665002</p>
+            </div>
+            <div>
+              <div class="text-2xl mb-2">🕒</div>
+              <h3 class="font-semibold mb-1">Business Hours</h3>
+              <p class="opacity-90">Mon-Sun: 9AM-8PM</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Links -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-8">
+        Helpful Resources
+      </h2>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a
+          href="/shop"
+          class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center"
+        >
+          <div class="text-4xl mb-4">🛒</div>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Start Customizing</h3>
+          <p class="text-gray-600 text-sm">Create your personalised balloon now</p>
+        </a>
+
+        <a
+          href="/services/weddings"
+          class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center"
+        >
+          <div class="text-4xl mb-4">💒</div>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Wedding Services</h3>
+          <p class="text-gray-600 text-sm">Special balloon arrangements for weddings</p>
+        </a>
+
+        <a
+          href="/locations/london"
+          class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center"
+        >
+          <div class="text-4xl mb-4">📍</div>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Delivery Areas</h3>
+          <p class="text-gray-600 text-sm">Check our UK-wide delivery coverage</p>
+        </a>
+
+        <a
+          href="/about"
+          class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center"
+        >
+          <div class="text-4xl mb-4">ℹ️</div>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">About Us</h3>
+          <p class="text-gray-600 text-sm">Learn more about Gifted Balloon</p>
+        </a>
+
+        <a
+          href="/services/corporate-events"
+          class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center"
+        >
+          <div class="text-4xl mb-4">🏢</div>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Corporate Orders</h3>
+          <p class="text-gray-600 text-sm">Bulk orders for business events</p>
+        </a>
+
+        <a
+          href="/contact"
+          class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-center"
+        >
+          <div class="text-4xl mb-4">💬</div>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Contact Support</h3>
+          <p class="text-gray-600 text-sm">Get personal assistance</p>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Custom styles for FAQ page */
+  details[open] summary {
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  /* Smooth animation for details opening */
+  details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details[open] > summary + * {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Scroll margin for anchor links */
+  [id] {
+    scroll-margin-top: 100px;
+  }
+</style>

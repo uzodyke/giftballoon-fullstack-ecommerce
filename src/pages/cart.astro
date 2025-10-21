@@ -1,0 +1,337 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Shopping Cart' }
+];
+
+// Cart page schema
+const cartSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Shopping Cart - Personalised Balloons",
+  "description": "Review your personalised balloon selections before checkout",
+  "url": "https://giftedballoon.com/cart"
+};
+---
+
+<BaseLayout
+  title="Shopping Cart | Review Your Balloon Orders | Gifted Balloon"
+  description="Review your personalised balloon selections and proceed to secure checkout. Modify quantities and delivery details before completing your order."
+  ogImage="/images/5. Love bouquet_£30.png"
+  schema={cartSchema}
+  keywords="shopping cart, balloon cart, review order, personalised balloon checkout"
+>
+  <!-- Breadcrumb -->
+  <Breadcrumb items={breadcrumbItems} />
+
+  <!-- Cart Page -->
+  <section class="py-16 bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Cart Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Your Shopping Cart
+        </h1>
+        <p class="text-xl text-gray-600">
+          Review your personalised balloon selections
+        </p>
+      </div>
+
+      <!-- Cart Content -->
+      <div class="grid lg:grid-cols-3 gap-8">
+
+        <!-- Cart Items -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+              <h2 class="text-xl font-bold text-gray-900">Cart Items</h2>
+            </div>
+
+            <!-- Cart Items Container -->
+            <div id="cartItemsContainer" class="p-6">
+              <!-- Items will be loaded here by JavaScript -->
+            </div>
+
+            <!-- Continue Shopping -->
+            <div class="p-6 border-t border-gray-200 bg-gray-50">
+              <a
+                href="/shop"
+                class="inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold"
+              >
+                ← Continue Shopping
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-2xl p-6 shadow-xl sticky top-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
+
+            <!-- Summary Details -->
+            <div class="space-y-4 mb-6">
+              <div class="flex justify-between">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal" class="font-semibold">£0.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Delivery:</span>
+                <span id="cartDeliveryFee" class="font-semibold">£5.99</span>
+              </div>
+              <div class="flex justify-between text-lg font-bold text-primary-600 border-t border-gray-200 pt-4">
+                <span>Total:</span>
+                <span id="cartGrandTotal">£5.99</span>
+              </div>
+
+              <!-- Free Delivery Notice -->
+              <div id="freeDeliveryNotice" class="hidden bg-green-50 text-green-700 p-3 rounded-lg text-sm">
+                🎉 Congratulations! You qualify for FREE delivery!
+              </div>
+
+              <!-- Almost Free Delivery -->
+              <div id="almostFreeDelivery" class="hidden bg-yellow-50 text-yellow-700 p-3 rounded-lg text-sm">
+                Add <span id="amountForFreeDelivery" class="font-bold"></span> more for FREE delivery!
+              </div>
+            </div>
+
+            <!-- Checkout Button -->
+            <button
+              id="proceedToCheckoutBtn"
+              disabled
+              class="w-full bg-gray-400 text-white py-4 rounded-lg font-bold text-lg transition-colors duration-200 disabled:cursor-not-allowed mb-4"
+            >
+              Proceed to Checkout
+            </button>
+
+            <!-- Security & Support -->
+            <div class="space-y-4 pt-4 border-t border-gray-200">
+              <div class="flex items-center justify-center space-x-4 text-sm text-gray-600">
+                <div class="flex items-center">
+                  <span class="text-green-500 mr-1">🔒</span>
+                  <span>Secure Checkout</span>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-blue-500 mr-1">🚚</span>
+                  <span>Fast Delivery</span>
+                </div>
+              </div>
+
+              <div class="text-center text-sm text-gray-600">
+                <p class="mb-2">Need help?</p>
+                <div class="space-x-4">
+                  <a href="tel:+447459665002" class="text-primary-600 hover:text-primary-700 font-semibold">
+                    📞 +44 7459 665002
+                  </a>
+                  <a href="mailto:info@giftedballoon.com" class="text-primary-600 hover:text-primary-700 font-semibold">
+                    📧 Email
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  let cart = [];
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadCart();
+    setupEventListeners();
+  });
+
+  function loadCart() {
+    const cartData = localStorage.getItem('cart');
+    if (cartData) {
+      cart = JSON.parse(cartData);
+    }
+    displayCartItems();
+    updateCartSummary();
+  }
+
+  function displayCartItems() {
+    const container = document.getElementById('cartItemsContainer');
+
+    if (!cart || cart.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-12">
+          <div class="text-6xl mb-4">🛒</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h3>
+          <p class="text-gray-600 mb-6">Start shopping for personalised balloons!</p>
+          <a
+            href="/shop"
+            class="inline-block bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Start Shopping
+          </a>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = cart.map((item, index) => `
+      <div class="cart-item border-b border-gray-200 pb-6 mb-6 last:border-b-0 last:mb-0" data-index="${index}">
+        <div class="flex items-start space-x-4">
+          <!-- Product Image -->
+          <div class="flex-shrink-0">
+            <img
+              src="${item.product?.image || item.image}"
+              alt="${item.product?.name || item.name}"
+              class="w-24 h-24 object-contain rounded-lg bg-gradient-to-br from-pink-50 to-purple-50 p-2"
+            />
+          </div>
+
+          <!-- Product Details -->
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">
+              ${item.product?.name || item.name}
+            </h3>
+
+            <div class="space-y-1 text-sm text-gray-600 mb-3">
+              <p><strong>Custom Text:</strong> "${item.customization?.customName || item.customName}"</p>
+              <p><strong>Occasion:</strong> ${item.customization?.occasionType || item.occasionType}</p>
+              <p><strong>Delivery Date:</strong> ${item.customization?.deliveryDate || item.deliveryDate}</p>
+              <p><strong>Style:</strong> ${item.customization?.balloonStyle || item.balloonStyle || 'Standard'}</p>
+            </div>
+
+            <!-- Quantity Controls -->
+            <div class="flex items-center space-x-3">
+              <span class="text-sm font-medium text-gray-900">Quantity:</span>
+              <div class="flex items-center space-x-2">
+                <button
+                  onclick="updateQuantity(${index}, ${item.quantity - 1})"
+                  class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold transition-colors"
+                  ${item.quantity <= 1 ? 'disabled' : ''}
+                >
+                  −
+                </button>
+                <span class="w-8 text-center font-semibold">${item.quantity}</span>
+                <button
+                  onclick="updateQuantity(${index}, ${item.quantity + 1})"
+                  class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold transition-colors"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price and Remove -->
+          <div class="flex flex-col items-end space-y-2">
+            <div class="text-right">
+              <p class="text-lg font-bold text-primary-600">£${(item.totalPrice || item.unitPrice * item.quantity).toFixed(2)}</p>
+              <p class="text-sm text-gray-500">£${(item.unitPrice || 0).toFixed(2)} each</p>
+            </div>
+            <button
+              onclick="removeFromCart(${index})"
+              class="text-red-500 hover:text-red-700 text-sm font-medium transition-colors"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateQuantity(index, newQuantity) {
+    if (newQuantity < 1) return;
+
+    cart[index].quantity = newQuantity;
+    cart[index].totalPrice = cart[index].unitPrice * newQuantity;
+
+    saveCart();
+    displayCartItems();
+    updateCartSummary();
+  }
+
+  function removeFromCart(index) {
+    cart.splice(index, 1);
+    saveCart();
+    displayCartItems();
+    updateCartSummary();
+  }
+
+  function saveCart() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }
+
+  function updateCartSummary() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.totalPrice || item.unitPrice * item.quantity), 0);
+    const deliveryFee = subtotal >= 50 ? 0 : 5.99;
+    const grandTotal = subtotal + deliveryFee;
+
+    document.getElementById('cartSubtotal').textContent = `£${subtotal.toFixed(2)}`;
+    document.getElementById('cartDeliveryFee').textContent = deliveryFee === 0 ? 'FREE' : `£${deliveryFee.toFixed(2)}`;
+    document.getElementById('cartGrandTotal').textContent = `£${grandTotal.toFixed(2)}`;
+
+    // Free delivery notices
+    const freeDeliveryNotice = document.getElementById('freeDeliveryNotice');
+    const almostFreeDelivery = document.getElementById('almostFreeDelivery');
+
+    if (subtotal >= 50) {
+      freeDeliveryNotice.classList.remove('hidden');
+      almostFreeDelivery.classList.add('hidden');
+    } else if (subtotal > 0) {
+      const amountNeeded = 50 - subtotal;
+      document.getElementById('amountForFreeDelivery').textContent = `£${amountNeeded.toFixed(2)}`;
+      almostFreeDelivery.classList.remove('hidden');
+      freeDeliveryNotice.classList.add('hidden');
+    } else {
+      freeDeliveryNotice.classList.add('hidden');
+      almostFreeDelivery.classList.add('hidden');
+    }
+
+    // Update checkout button
+    const checkoutBtn = document.getElementById('proceedToCheckoutBtn');
+    if (cart.length > 0) {
+      checkoutBtn.disabled = false;
+      checkoutBtn.classList.remove('bg-gray-400');
+      checkoutBtn.classList.add('bg-primary-500', 'hover:bg-primary-600');
+      checkoutBtn.textContent = `Proceed to Checkout (£${grandTotal.toFixed(2)})`;
+    } else {
+      checkoutBtn.disabled = true;
+      checkoutBtn.classList.add('bg-gray-400');
+      checkoutBtn.classList.remove('bg-primary-500', 'hover:bg-primary-600');
+      checkoutBtn.textContent = 'Cart is Empty';
+    }
+  }
+
+  function setupEventListeners() {
+    document.getElementById('proceedToCheckoutBtn').addEventListener('click', function() {
+      if (cart.length > 0) {
+        window.location.href = '/checkout';
+      }
+    });
+  }
+
+  // Global functions for inline onclick handlers
+  window.updateQuantity = updateQuantity;
+  window.removeFromCart = removeFromCart;
+</script>
+
+<style>
+  .cart-item {
+    transition: all 0.3s ease;
+  }
+
+  .cart-item:hover {
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: -1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cart-item:last-child:hover {
+    margin-bottom: -1rem;
+  }
+</style>

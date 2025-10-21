@@ -1,0 +1,734 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Shop', href: '/shop' },
+  { label: 'Checkout' }
+];
+
+// Checkout page schema
+const checkoutSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Checkout - Personalised Balloons",
+  "description": "Complete your personalised balloon order with secure payment",
+  "url": "https://giftedballoon.com/checkout"
+};
+---
+
+<BaseLayout
+  title="Checkout | Complete Your Balloon Order | Gifted Balloon"
+  description="Complete your personalised balloon order with secure payment. Fast checkout with multiple payment options available."
+  ogImage="/images/5. Love bouquet_£30.png"
+  schema={checkoutSchema}
+  keywords="balloon checkout, secure payment, personalised balloon order, complete purchase"
+>
+  <!-- Breadcrumb -->
+  <Breadcrumb items={breadcrumbItems} />
+
+  <!-- Checkout Page -->
+  <section class="py-16 bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-3 gap-8">
+
+        <!-- Order Summary -->
+        <div class="lg:col-span-1 order-2 lg:order-1">
+          <div class="bg-white rounded-2xl p-6 shadow-xl sticky top-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
+
+            <!-- Order Items Container -->
+            <div id="orderItems" class="space-y-4 mb-6">
+              <!-- Items will be loaded here by JavaScript -->
+            </div>
+
+            <!-- Order Totals -->
+            <div class="border-t border-gray-200 pt-4 space-y-3">
+              <div class="flex justify-between">
+                <span>Subtotal:</span>
+                <span id="subtotal" class="font-semibold">£0.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Delivery:</span>
+                <span id="deliveryFee" class="font-semibold">£5.99</span>
+              </div>
+              <div class="flex justify-between text-lg font-bold text-primary-600 border-t border-gray-200 pt-3">
+                <span>Total:</span>
+                <span id="grandTotal">£5.99</span>
+              </div>
+            </div>
+
+            <!-- Security Badges -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+              <div class="flex items-center justify-center space-x-4 text-sm text-gray-600">
+                <div class="flex items-center">
+                  <span class="text-green-500 mr-1">🔒</span>
+                  <span>Secure SSL</span>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-blue-500 mr-1">💳</span>
+                  <span>Card Protected</span>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-purple-500 mr-1">⚡</span>
+                  <span>Fast Checkout</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="lg:col-span-2 order-1 lg:order-2">
+          <div class="bg-white rounded-2xl p-8 shadow-xl">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Complete Your Order</h1>
+
+            <form id="checkoutForm" class="space-y-8">
+
+              <!-- Customer Information -->
+              <div class="space-y-6">
+                <h2 class="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">
+                  Customer Information
+                </h2>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label for="firstName" class="block text-sm font-semibold text-gray-900 mb-2">
+                      First Name <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      required
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                      placeholder="Enter your first name"
+                    />
+                  </div>
+
+                  <div>
+                    <label for="lastName" class="block text-sm font-semibold text-gray-900 mb-2">
+                      Last Name <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      required
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                      placeholder="Enter your last name"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label for="email" class="block text-sm font-semibold text-gray-900 mb-2">
+                    Email Address <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                    placeholder="your.email@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label for="phone" class="block text-sm font-semibold text-gray-900 mb-2">
+                    Phone Number <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    required
+                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                    placeholder="+44 7XXX XXXXXX"
+                  />
+                </div>
+              </div>
+
+              <!-- Delivery Information -->
+              <div class="space-y-6">
+                <h2 class="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">
+                  Delivery Information
+                </h2>
+
+                <div>
+                  <label for="deliveryAddress" class="block text-sm font-semibold text-gray-900 mb-2">
+                    Delivery Address <span class="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    id="deliveryAddress"
+                    name="deliveryAddress"
+                    required
+                    rows="3"
+                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors resize-none"
+                    placeholder="Enter full delivery address..."
+                  ></textarea>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label for="city" class="block text-sm font-semibold text-gray-900 mb-2">
+                      City <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="city"
+                      name="city"
+                      required
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                      placeholder="London, Manchester, etc."
+                    />
+                  </div>
+
+                  <div>
+                    <label for="postcode" class="block text-sm font-semibold text-gray-900 mb-2">
+                      Postcode <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="postcode"
+                      name="postcode"
+                      required
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                      placeholder="SW1A 1AA"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label for="deliveryNotes" class="block text-sm font-semibold text-gray-900 mb-2">
+                    Special Delivery Instructions (Optional)
+                  </label>
+                  <textarea
+                    id="deliveryNotes"
+                    name="deliveryNotes"
+                    rows="2"
+                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors resize-none"
+                    placeholder="Any special instructions for delivery..."
+                  ></textarea>
+                </div>
+              </div>
+
+              <!-- Payment Method -->
+              <div class="space-y-6">
+                <h2 class="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">
+                  Payment Method
+                </h2>
+
+                <!-- Payment Options -->
+                <div class="space-y-4">
+                  <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
+                    <label class="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="card"
+                        checked
+                        class="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      />
+                      <span class="ml-3 font-semibold">Credit/Debit Card</span>
+                      <div class="ml-auto flex space-x-2">
+                        <span class="text-2xl">💳</span>
+                        <span class="text-sm text-gray-500">Visa, Mastercard, Amex</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
+                    <label class="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="paypal"
+                        class="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      />
+                      <span class="ml-3 font-semibold">PayPal</span>
+                      <div class="ml-auto">
+                        <span class="text-2xl">💰</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
+                    <label class="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="applepay"
+                        class="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      />
+                      <span class="ml-3 font-semibold">Apple Pay / Google Pay</span>
+                      <div class="ml-auto">
+                        <span class="text-2xl">📱</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Card Details (shown when card is selected) -->
+                <div id="cardDetails" class="space-y-4 bg-gray-50 p-6 rounded-lg">
+                  <div>
+                    <label for="cardNumber" class="block text-sm font-semibold text-gray-900 mb-2">
+                      Card Number <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="cardNumber"
+                      name="cardNumber"
+                      placeholder="1234 5678 9012 3456"
+                      maxlength="19"
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                    />
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label for="expiryDate" class="block text-sm font-semibold text-gray-900 mb-2">
+                        Expiry Date <span class="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="expiryDate"
+                        name="expiryDate"
+                        placeholder="MM/YY"
+                        maxlength="5"
+                        class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label for="cvv" class="block text-sm font-semibold text-gray-900 mb-2">
+                        CVV <span class="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="cvv"
+                        name="cvv"
+                        placeholder="123"
+                        maxlength="4"
+                        class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="cardholderName" class="block text-sm font-semibold text-gray-900 mb-2">
+                      Cardholder Name <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="cardholderName"
+                      name="cardholderName"
+                      placeholder="Name as shown on card"
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Terms and Complete Order -->
+              <div class="space-y-6">
+                <div class="flex items-start">
+                  <input
+                    type="checkbox"
+                    id="agreeTerms"
+                    name="agreeTerms"
+                    required
+                    class="w-4 h-4 text-primary-600 focus:ring-primary-500 mt-1"
+                  />
+                  <label for="agreeTerms" class="ml-3 text-sm text-gray-600">
+                    I agree to the <a href="/terms-and-conditions" class="text-primary-600 hover:text-primary-700 underline">Terms and Conditions</a>
+                    and <a href="/privacy-policy" class="text-primary-600 hover:text-primary-700 underline">Privacy Policy</a>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  id="completeOrderBtn"
+                  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-4 rounded-lg font-bold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  Complete Order & Pay
+                </button>
+
+                <!-- Alternative Contact -->
+                <div class="text-center pt-4 border-t border-gray-200">
+                  <p class="text-gray-600 mb-4">Need help with your order?</p>
+                  <div class="flex justify-center space-x-4">
+                    <a
+                      href="tel:+447459665002"
+                      class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+                    >
+                      📞 Call +44 7459 665002
+                    </a>
+                    <a
+                      href="mailto:info@giftedballoon.com"
+                      class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+                    >
+                      📧 Email Us
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Success Modal -->
+  <div id="orderSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
+      <div class="text-6xl mb-4">🎉</div>
+      <h3 class="text-2xl font-bold text-gray-900 mb-4">Order Confirmed!</h3>
+      <p class="text-gray-600 mb-6" id="orderConfirmationMessage">
+        Thank you for your order! Your personalised balloon will be prepared and delivered on your chosen date.
+      </p>
+      <div class="space-y-4">
+        <p class="text-sm text-gray-500">
+          Order Reference: <span id="orderReference" class="font-bold">#GB-2024-XXXX</span>
+        </p>
+        <div class="flex space-x-4">
+          <button
+            id="viewOrderBtn"
+            class="flex-1 bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            View Order
+          </button>
+          <button
+            id="continueShoppingBtn"
+            class="flex-1 border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  let currentOrder = null;
+  let cart = [];
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadOrderData();
+    setupEventListeners();
+    calculateTotals();
+  });
+
+  function loadOrderData() {
+    // Check for direct order from shop page
+    const orderData = localStorage.getItem('currentOrder');
+    if (orderData) {
+      currentOrder = JSON.parse(orderData);
+      cart = [currentOrder];
+    } else {
+      // Load cart items
+      const cartData = localStorage.getItem('cart');
+      if (cartData) {
+        cart = JSON.parse(cartData);
+      }
+    }
+
+    displayOrderItems();
+  }
+
+  function displayOrderItems() {
+    const orderItemsContainer = document.getElementById('orderItems');
+    if (!cart || cart.length === 0) {
+      orderItemsContainer.innerHTML = `
+        <div class="text-center py-8">
+          <p class="text-gray-500 mb-4">No items in your order</p>
+          <a href="/shop" class="text-primary-600 hover:text-primary-700 font-semibold">
+            ← Continue Shopping
+          </a>
+        </div>
+      `;
+      return;
+    }
+
+    orderItemsContainer.innerHTML = cart.map(item => `
+      <div class="border border-gray-200 rounded-lg p-4">
+        <div class="flex items-center space-x-4">
+          <img
+            src="${item.product?.image || item.image}"
+            alt="${item.product?.name || item.name}"
+            class="w-16 h-16 object-contain rounded-lg bg-gray-50"
+          />
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">${item.product?.name || item.name}</h3>
+            <p class="text-sm text-gray-600">Custom Text: "${item.customization?.customName || item.customName}"</p>
+            <p class="text-sm text-gray-600">Occasion: ${item.customization?.occasionType || item.occasionType}</p>
+            <p class="text-sm text-gray-600">Delivery: ${item.customization?.deliveryDate || item.deliveryDate}</p>
+            <p class="text-sm text-gray-600">Quantity: ${item.quantity}</p>
+          </div>
+          <div class="text-right">
+            <p class="font-bold text-primary-600">£${(item.totalPrice || item.unitPrice * item.quantity).toFixed(2)}</p>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function calculateTotals() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.totalPrice || item.unitPrice * item.quantity), 0);
+    const deliveryFee = subtotal >= 50 ? 0 : 5.99;
+    const grandTotal = subtotal + deliveryFee;
+
+    document.getElementById('subtotal').textContent = `£${subtotal.toFixed(2)}`;
+    document.getElementById('deliveryFee').textContent = deliveryFee === 0 ? 'FREE' : `£${deliveryFee.toFixed(2)}`;
+    document.getElementById('grandTotal').textContent = `£${grandTotal.toFixed(2)}`;
+  }
+
+  function setupEventListeners() {
+    // Payment method toggle
+    const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+    const cardDetails = document.getElementById('cardDetails');
+
+    paymentMethods.forEach(method => {
+      method.addEventListener('change', function() {
+        if (this.value === 'card') {
+          cardDetails.style.display = 'block';
+        } else {
+          cardDetails.style.display = 'none';
+        }
+      });
+    });
+
+    // Form validation and submission
+    const checkoutForm = document.getElementById('checkoutForm');
+    checkoutForm.addEventListener('submit', handleFormSubmission);
+
+    // Card number formatting
+    const cardNumberInput = document.getElementById('cardNumber');
+    cardNumberInput.addEventListener('input', function() {
+      let value = this.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+      let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+      this.value = formattedValue;
+    });
+
+    // Expiry date formatting
+    const expiryInput = document.getElementById('expiryDate');
+    expiryInput.addEventListener('input', function() {
+      let value = this.value.replace(/\D/g, '');
+      if (value.length >= 3) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+      }
+      this.value = value;
+    });
+
+    // CVV validation
+    const cvvInput = document.getElementById('cvv');
+    cvvInput.addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g, '');
+    });
+
+    // Modal handlers
+    document.getElementById('viewOrderBtn').addEventListener('click', function() {
+      // In a real app, this would redirect to an order tracking page
+      alert('Order tracking feature coming soon!');
+    });
+
+    document.getElementById('continueShoppingBtn').addEventListener('click', function() {
+      window.location.href = '/shop';
+    });
+  }
+
+  function handleFormSubmission(e) {
+    e.preventDefault();
+
+    // Validate form
+    if (!validateCheckoutForm()) {
+      return;
+    }
+
+    // Show loading state
+    const submitBtn = document.getElementById('completeOrderBtn');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Processing...';
+    submitBtn.disabled = true;
+
+    // Simulate payment processing
+    setTimeout(() => {
+      processOrder();
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }, 2000);
+  }
+
+  function validateCheckoutForm() {
+    const requiredFields = document.querySelectorAll('[required]');
+    let isValid = true;
+
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        field.classList.add('border-red-500');
+        isValid = false;
+      } else {
+        field.classList.remove('border-red-500');
+      }
+    });
+
+    // Validate email
+    const email = document.getElementById('email').value;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      document.getElementById('email').classList.add('border-red-500');
+      isValid = false;
+    }
+
+    // Validate payment method specific fields
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    if (paymentMethod === 'card') {
+      const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+      const expiryDate = document.getElementById('expiryDate').value;
+      const cvv = document.getElementById('cvv').value;
+
+      if (cardNumber.length < 13 || cardNumber.length > 19) {
+        document.getElementById('cardNumber').classList.add('border-red-500');
+        isValid = false;
+      }
+
+      if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+        document.getElementById('expiryDate').classList.add('border-red-500');
+        isValid = false;
+      }
+
+      if (cvv.length < 3 || cvv.length > 4) {
+        document.getElementById('cvv').classList.add('border-red-500');
+        isValid = false;
+      }
+    }
+
+    if (!isValid) {
+      alert('Please fill in all required fields correctly.');
+    }
+
+    return isValid;
+  }
+
+  function processOrder() {
+    // Calculate totals
+    const subtotal = cart.reduce((sum, item) => sum + (item.totalPrice || item.unitPrice * item.quantity), 0);
+    const deliveryFee = subtotal >= 50 ? 0 : 5.99;
+    const grandTotal = subtotal + deliveryFee;
+
+    // Generate order reference
+    const orderRef = 'GB-' + new Date().getFullYear() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+    // Collect order data
+    const orderData = {
+      reference: orderRef,
+      items: cart,
+      customer: {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value
+      },
+      delivery: {
+        address: document.getElementById('deliveryAddress').value,
+        city: document.getElementById('city').value,
+        postcode: document.getElementById('postcode').value,
+        country: 'United Kingdom',
+        date: document.getElementById('deliveryDate').value,
+        timeSlot: document.getElementById('timeSlot').value,
+        instructions: document.getElementById('deliveryNotes').value
+      },
+      payment: {
+        method: document.querySelector('input[name="paymentMethod"]:checked').value,
+        total: grandTotal
+      },
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
+      total: grandTotal,
+      timestamp: new Date().toISOString()
+    };
+
+    // Store order in localStorage (in a real app, this would be sent to a server)
+    let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    orders.push(orderData);
+    localStorage.setItem('orders', JSON.stringify(orders));
+
+    // Store order in session storage for confirmation page
+    sessionStorage.setItem('lastOrder', JSON.stringify(orderData));
+
+    // Track analytics
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'purchase', {
+        'transaction_id': orderRef,
+        'value': grandTotal,
+        'currency': 'GBP',
+        'items': cart.map(item => ({
+          'item_id': item.product?.id || item.id,
+          'item_name': item.product?.name || item.name,
+          'category': 'Personalised Balloons',
+          'quantity': item.quantity,
+          'price': item.unitPrice
+        }))
+      });
+    }
+
+    // Send confirmation email (in a real app)
+    console.log('Order processed:', orderData);
+
+    // Redirect to confirmation page
+    window.location.href = '/order-confirmation';
+
+    // Optional: Send order data to your backend
+    // fetch('/api/orders', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(orderData)
+    // });
+  }
+</script>
+
+<style>
+  /* Additional styles for checkout page */
+  .checkout-step {
+    transition: all 0.3s ease;
+  }
+
+  .checkout-step.active {
+    border-color: #ff6b9d;
+    background-color: #fff1f8;
+  }
+
+  /* Custom radio button styling */
+  input[type="radio"]:checked + span {
+    color: #ff6b9d;
+  }
+
+  /* Loading state */
+  .loading {
+    position: relative;
+    pointer-events: none;
+  }
+
+  .loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #ffffff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>

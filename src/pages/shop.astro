@@ -1,0 +1,799 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import { products } from '@/data/products';
+
+// Shop page schema
+const shopSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Shop Personalised Balloons",
+  "description": "Customize your personalised balloon with custom names, occasions, and delivery dates",
+  "url": "https://giftedballoon.com/shop",
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": products.map((product, index) => ({
+      "@type": "Product",
+      "position": index + 1,
+      "name": product.name,
+      "offers": {
+        "@type": "Offer",
+        "price": product.price.toFixed(2),
+        "priceCurrency": "GBP"
+      }
+    }))
+  }
+};
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Shop Personalised Balloons' }
+];
+---
+
+<BaseLayout
+  title="Shop Personalised Balloons | Custom Balloon Customization | Gifted Balloon"
+  description="Customize your personalised balloon with custom names, occasions, and delivery dates. Perfect for birthdays, weddings, anniversaries and all celebrations."
+  ogImage="/images/5. Love bouquet_£30.png"
+  schema={shopSchema}
+  keywords="shop personalised balloons, custom balloon, balloon customization, personalised gifts, balloon delivery, custom names"
+>
+  <!-- Breadcrumb -->
+  <Breadcrumb items={breadcrumbItems} />
+
+  <!-- Shop Page Content -->
+  <section class="py-16 bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12">
+        <!-- Product Selection & Image -->
+        <div class="space-y-8">
+          <!-- Product Selection -->
+          <div class="bg-white rounded-2xl p-6 shadow-xl">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">
+              Customize Your Personalised Balloon
+            </h1>
+
+            <!-- Product Selector -->
+            <div class="space-y-4">
+              <label for="productSelect" class="block text-lg font-semibold text-gray-900">
+                Choose Your Balloon Design:
+              </label>
+              <select
+                id="productSelect"
+                name="productSelect"
+                class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+              >
+                <option value="">Select a balloon design...</option>
+                {products.map((product) => (
+                  <option value={product.id} data-price={product.price} data-image={product.image} data-name={product.name}>
+                    {product.name} - £{product.price.toFixed(2)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <!-- Selected Product Display -->
+          <div id="productDisplay" class="bg-white rounded-2xl p-6 shadow-xl hidden">
+            <div class="space-y-4">
+              <!-- Product Image with full visibility and curved border -->
+              <div class="relative bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6">
+                <img
+                  id="selectedProductImage"
+                  src=""
+                  alt=""
+                  class="w-full h-80 object-contain rounded-xl"
+                  loading="lazy"
+                />
+                <div id="priceTag" class="absolute top-4 right-4 bg-primary-500 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+                  £0.00
+                </div>
+              </div>
+
+              <!-- Product Info -->
+              <div class="text-center space-y-2">
+                <h2 id="selectedProductName" class="text-2xl font-bold text-gray-900"></h2>
+                <p id="selectedProductDescription" class="text-gray-600"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customization Form -->
+        <div class="bg-white rounded-2xl p-8 shadow-xl">
+          <form id="customizationForm" class="space-y-6">
+            <!-- Balloon Style Selection -->
+            <div class="space-y-3">
+              <label for="balloonStyle" class="block text-lg font-semibold text-gray-900">
+                Balloon Style:
+              </label>
+              <select
+                id="balloonStyle"
+                name="balloonStyle"
+                class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+              >
+                <option value="standard">Standard Style</option>
+                <option value="premium">Premium Style (+£5)</option>
+                <option value="luxury">Luxury Style (+£10)</option>
+              </select>
+            </div>
+
+            <!-- Custom Name Text -->
+            <div class="space-y-3">
+              <label for="customName" class="block text-lg font-semibold text-gray-900">
+                Custom Name/Text: <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="customName"
+                name="customName"
+                maxlength="30"
+                required
+                placeholder="Enter name or message (max 30 characters)"
+                class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+              />
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">Professional vinyl lettering included</span>
+                <span id="charCounter" class="text-gray-400">0/30 characters</span>
+              </div>
+            </div>
+
+            <!-- Occasion Type -->
+            <div class="space-y-3">
+              <label for="occasionType" class="block text-lg font-semibold text-gray-900">
+                Occasion Type: <span class="text-red-500">*</span>
+              </label>
+              <select
+                id="occasionType"
+                name="occasionType"
+                required
+                class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+              >
+                <option value="">Select an occasion</option>
+                <option value="wedding">Wedding</option>
+                <option value="anniversary">Anniversary</option>
+                <option value="valentine">Valentine's Day</option>
+                <option value="christmas">Christmas</option>
+                <option value="newyear">New Year</option>
+                <option value="mothersday">Mother's Day</option>
+                <option value="fathersday">Father's Day</option>
+                <option value="birthday">Birthday</option>
+                <option value="corporate">Corporate Events</option>
+                <option value="engagement">Engagement</option>
+                <option value="babyshower">Baby Shower</option>
+                <option value="graduation">Graduation</option>
+                <option value="thankyou">Thank You</option>
+                <option value="others">Others</option>
+              </select>
+            </div>
+
+            <!-- Occasion Notes (appears only when "Others" is selected) -->
+            <div id="occasionNotesGroup" class="space-y-3 hidden">
+              <label for="occasionNotes" class="block text-lg font-semibold text-gray-900">
+                Occasion Notes:
+              </label>
+              <textarea
+                id="occasionNotes"
+                name="occasionNotes"
+                rows="3"
+                placeholder="Please describe your special occasion..."
+                class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors resize-none"
+              ></textarea>
+            </div>
+
+            <!-- Delivery Date -->
+            <div class="space-y-3">
+              <label for="deliveryDate" class="block text-lg font-semibold text-gray-900">
+                Delivery Date: <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                id="deliveryDate"
+                name="deliveryDate"
+                required
+                class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+              />
+              <p class="text-sm text-gray-500">
+                📅 Please allow at least 2 business days for preparation
+              </p>
+            </div>
+
+            <!-- Quantity -->
+            <div class="space-y-3">
+              <label for="quantity" class="block text-lg font-semibold text-gray-900">
+                Quantity: <span class="text-red-500">*</span>
+              </label>
+              <div class="flex items-center gap-4">
+                <button
+                  type="button"
+                  id="decreaseQty"
+                  class="w-12 h-12 bg-primary-500 text-white rounded-full font-bold text-xl hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-300"
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  id="quantity"
+                  name="quantity"
+                  value="1"
+                  min="1"
+                  max="99"
+                  required
+                  class="w-20 p-4 border-2 border-gray-200 rounded-lg text-center font-bold text-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                />
+                <button
+                  type="button"
+                  id="increaseQty"
+                  class="w-12 h-12 bg-primary-500 text-white rounded-full font-bold text-xl hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-300"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <!-- Price Summary -->
+            <div class="bg-gray-50 rounded-xl p-6 space-y-4">
+              <h3 class="text-lg font-bold text-gray-900">Price Summary</h3>
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span>Unit Price:</span>
+                  <span id="displayUnitPrice" class="font-semibold">£0.00</span>
+                </div>
+                <div id="styleUpchargeRow" class="flex justify-between hidden">
+                  <span>Style Upgrade:</span>
+                  <span id="displayStyleUpcharge" class="font-semibold">£0.00</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Quantity:</span>
+                  <span id="displayQuantity" class="font-semibold">1</span>
+                </div>
+                <hr class="border-gray-300">
+                <div class="flex justify-between text-xl font-bold text-primary-600">
+                  <span>Total Price:</span>
+                  <span id="displayTotalPrice">£0.00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-4">
+              <button
+                type="button"
+                id="addToCartBtn"
+                disabled
+                class="w-full bg-gray-400 text-white py-4 rounded-lg font-bold text-lg transition-all duration-200 disabled:cursor-not-allowed"
+              >
+                Add to Cart
+              </button>
+              <button
+                type="button"
+                id="buyNowBtn"
+                disabled
+                class="w-full bg-primary-500 hover:bg-primary-600 text-white py-4 rounded-lg font-bold text-lg transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                Buy Now
+              </button>
+            </div>
+
+            <!-- Trust Badges -->
+            <div class="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+              <div class="text-center text-sm text-gray-600">
+                <div class="text-2xl mb-1">🎨</div>
+                <span>Custom Design</span>
+              </div>
+              <div class="text-center text-sm text-gray-600">
+                <div class="text-2xl mb-1">🚚</div>
+                <span>UK Delivery</span>
+              </div>
+              <div class="text-center text-sm text-gray-600">
+                <div class="text-2xl mb-1">⭐</div>
+                <span>5-Star Service</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Additional Information -->
+      <div class="mt-16 bg-white rounded-2xl p-8 shadow-xl">
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Product Details -->
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">What's Included</h3>
+            <ul class="space-y-2 text-gray-600">
+              <li class="flex items-center gap-2">
+                <span class="text-green-500">✓</span>
+                Professional vinyl lettering
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-green-500">✓</span>
+                Helium filling included
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-green-500">✓</span>
+                Decorative ribbon & weight
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-green-500">✓</span>
+                Premium balloon materials
+              </li>
+            </ul>
+          </div>
+
+          <!-- Delivery Info -->
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Delivery Options</h3>
+            <ul class="space-y-2 text-gray-600">
+              <li class="flex items-center gap-2">
+                <span class="text-blue-500">📍</span>
+                London: Same day delivery
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-blue-500">📍</span>
+                Major cities: Next day
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-blue-500">📍</span>
+                Standard: 2-3 business days
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-blue-500">📍</span>
+                Free delivery over £50
+              </li>
+            </ul>
+          </div>
+
+          <!-- Care Instructions -->
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Care Instructions</h3>
+            <ul class="space-y-2 text-gray-600">
+              <li class="flex items-center gap-2">
+                <span class="text-purple-500">⚠️</span>
+                Keep away from sharp objects
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-purple-500">🌡️</span>
+                Avoid extreme temperatures
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-purple-500">💨</span>
+                Secure against wind outdoors
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-purple-500">⏰</span>
+                Float time: 5-7 days
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Success Modal -->
+  <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
+      <div class="text-6xl mb-4">🎉</div>
+      <h3 class="text-2xl font-bold text-gray-900 mb-4">Order Successful!</h3>
+      <p class="text-gray-600 mb-6" id="successMessage">
+        Your personalised balloon has been added to cart successfully!
+      </p>
+      <button
+        id="closeSuccessModal"
+        class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+      >
+        Continue Shopping
+      </button>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Product data
+  const products = {
+    1: { name: "Heart Stuffed Balloon", price: 30.85, image: "/images/1.Heart Stuffed balloon_ £30.85.jpg", description: "Romantic heart-shaped balloon perfect for Valentine's Day and anniversaries" },
+    2: { name: "Luxury Stuffed Balloons", price: 45.00, image: "/images/2.Luxury Stuffed Balloons_£45.jpg", description: "Premium luxury balloon arrangement for special celebrations" },
+    3: { name: "Rose Charm Balloon", price: 26.00, image: "/images/3.Rose charm balloon_£26.avif", description: "Elegant rose-themed balloon with charming details" },
+    4: { name: "Stuffed Balloon Teddy Inside", price: 35.00, image: "/images/4.Stuffed Balloon Teddy Inside_£35.avif", description: "Surprise balloon with adorable teddy bear inside" },
+    5: { name: "Love Bouquet", price: 30.00, image: "/images/5. Love bouquet_£30.png", description: "Beautiful love-themed balloon bouquet for romantic occasions" },
+    6: { name: "Stuffed Wine Balloon", price: 35.00, image: "/images/6.Stuffed Wine Balloon_£35.avif", description: "Sophisticated wine-themed balloon for celebrations" },
+    7: { name: "Stuffed Balloon Teddy Outside", price: 35.00, image: "/images/7.Stuffed Balloon Teddy Outside_£35.jpg", description: "Charming balloon with teddy bear attachment" },
+    8: { name: "Golden Treasure Stuffed Balloon", price: 35.00, image: "/images/8.Golden Treasure Stuffed Balloon_£35.png", description: "Luxurious golden balloon with treasure surprise" },
+    9: { name: "Simplistic Glow", price: 25.00, image: "/images/9. Simplistic glow_£25.png", description: "Elegant minimalist balloon with beautiful glow effect" },
+    10: { name: "Picture Special", price: 40.00, image: "/images/10.PictureSpecial_£40.jpg", description: "Custom picture balloon for personalized memories" }
+  };
+
+  let currentProduct = null;
+  let basePrice = 0;
+  let styleUpcharge = 0;
+  let currentQuantity = 1;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeShop();
+    setupEventListeners();
+    updateDeliveryDateMin();
+
+    // Check for URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('product');
+    if (productId && products[productId]) {
+      document.getElementById('productSelect').value = productId;
+      selectProduct(productId);
+    }
+  });
+
+  function initializeShop() {
+    // Initialize form validation
+    setupFormValidation();
+  }
+
+  function setupEventListeners() {
+    // Product selection
+    document.getElementById('productSelect').addEventListener('change', function() {
+      const productId = this.value;
+      if (productId) {
+        selectProduct(productId);
+      } else {
+        hideProductDisplay();
+      }
+    });
+
+    // Custom name character counter
+    const customNameInput = document.getElementById('customName');
+    const charCounter = document.getElementById('charCounter');
+    customNameInput.addEventListener('input', function() {
+      const length = this.value.length;
+      charCounter.textContent = `${length}/30 characters`;
+      charCounter.style.color = length > 25 ? '#e74c3c' : '#6b7280';
+      validateForm();
+    });
+
+    // Occasion type change
+    document.getElementById('occasionType').addEventListener('change', function() {
+      const occasionNotesGroup = document.getElementById('occasionNotesGroup');
+      if (this.value === 'others') {
+        occasionNotesGroup.classList.remove('hidden');
+        document.getElementById('occasionNotes').required = true;
+      } else {
+        occasionNotesGroup.classList.add('hidden');
+        document.getElementById('occasionNotes').required = false;
+      }
+      validateForm();
+    });
+
+    // Balloon style change
+    document.getElementById('balloonStyle').addEventListener('change', function() {
+      updateStyleUpcharge();
+      updatePricing();
+    });
+
+    // Quantity controls
+    document.getElementById('decreaseQty').addEventListener('click', function() {
+      const qtyInput = document.getElementById('quantity');
+      if (parseInt(qtyInput.value) > 1) {
+        qtyInput.value = parseInt(qtyInput.value) - 1;
+        currentQuantity = parseInt(qtyInput.value);
+        updatePricing();
+      }
+    });
+
+    document.getElementById('increaseQty').addEventListener('click', function() {
+      const qtyInput = document.getElementById('quantity');
+      if (parseInt(qtyInput.value) < 99) {
+        qtyInput.value = parseInt(qtyInput.value) + 1;
+        currentQuantity = parseInt(qtyInput.value);
+        updatePricing();
+      }
+    });
+
+    document.getElementById('quantity').addEventListener('input', function() {
+      currentQuantity = parseInt(this.value) || 1;
+      updatePricing();
+      validateForm();
+    });
+
+    // Form validation on all required fields
+    const requiredFields = document.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+      field.addEventListener('change', validateForm);
+      field.addEventListener('input', validateForm);
+    });
+
+    // Button handlers
+    document.getElementById('addToCartBtn').addEventListener('click', addToCart);
+    document.getElementById('buyNowBtn').addEventListener('click', buyNow);
+
+    // Modal handlers
+    document.getElementById('closeSuccessModal').addEventListener('click', function() {
+      document.getElementById('successModal').classList.add('hidden');
+    });
+  }
+
+  function selectProduct(productId) {
+    currentProduct = products[productId];
+    if (!currentProduct) return;
+
+    basePrice = currentProduct.price;
+
+    // Show product display
+    const productDisplay = document.getElementById('productDisplay');
+    productDisplay.classList.remove('hidden');
+
+    // Update product info
+    document.getElementById('selectedProductImage').src = currentProduct.image;
+    document.getElementById('selectedProductImage').alt = currentProduct.name;
+    document.getElementById('selectedProductName').textContent = currentProduct.name;
+    document.getElementById('selectedProductDescription').textContent = currentProduct.description;
+
+    updatePricing();
+    validateForm();
+  }
+
+  function hideProductDisplay() {
+    document.getElementById('productDisplay').classList.add('hidden');
+    currentProduct = null;
+    basePrice = 0;
+    updatePricing();
+    validateForm();
+  }
+
+  function updateStyleUpcharge() {
+    const balloonStyle = document.getElementById('balloonStyle').value;
+    const styleUpchargeRow = document.getElementById('styleUpchargeRow');
+
+    switch(balloonStyle) {
+      case 'premium':
+        styleUpcharge = 5.00;
+        break;
+      case 'luxury':
+        styleUpcharge = 10.00;
+        break;
+      default:
+        styleUpcharge = 0;
+    }
+
+    if (styleUpcharge > 0) {
+      styleUpchargeRow.classList.remove('hidden');
+      document.getElementById('displayStyleUpcharge').textContent = `£${styleUpcharge.toFixed(2)}`;
+    } else {
+      styleUpchargeRow.classList.add('hidden');
+    }
+  }
+
+  function updatePricing() {
+    const unitPriceWithUpcharge = basePrice + styleUpcharge;
+    const totalPrice = unitPriceWithUpcharge * currentQuantity;
+
+    document.getElementById('displayUnitPrice').textContent = `£${basePrice.toFixed(2)}`;
+    document.getElementById('displayQuantity').textContent = currentQuantity;
+    document.getElementById('displayTotalPrice').textContent = `£${totalPrice.toFixed(2)}`;
+    document.getElementById('priceTag').textContent = `£${unitPriceWithUpcharge.toFixed(2)}`;
+  }
+
+  function updateDeliveryDateMin() {
+    const today = new Date();
+    let minDate = new Date(today);
+
+    // Add 2 business days
+    let daysAdded = 0;
+    while (daysAdded < 2) {
+      minDate.setDate(minDate.getDate() + 1);
+      // Skip weekends
+      if (minDate.getDay() !== 0 && minDate.getDay() !== 6) {
+        daysAdded++;
+      }
+    }
+
+    const minDateStr = minDate.toISOString().split('T')[0];
+    document.getElementById('deliveryDate').min = minDateStr;
+  }
+
+  function setupFormValidation() {
+    const form = document.getElementById('customizationForm');
+    const requiredFields = form.querySelectorAll('[required]');
+
+    requiredFields.forEach(field => {
+      field.addEventListener('blur', function() {
+        validateField(this);
+      });
+    });
+  }
+
+  function validateField(field) {
+    const value = field.value.trim();
+    let isValid = true;
+
+    // Remove existing error
+    const existingError = field.parentNode.querySelector('.error-message');
+    if (existingError) {
+      existingError.remove();
+    }
+
+    // Validate based on field type
+    if (field.required && !value) {
+      isValid = false;
+      showFieldError(field, 'This field is required');
+    } else if (field.id === 'customName' && value.length > 30) {
+      isValid = false;
+      showFieldError(field, 'Name must be 30 characters or less');
+    } else if (field.id === 'deliveryDate' && value) {
+      const selectedDate = new Date(value);
+      const minDate = new Date(field.min);
+      if (selectedDate < minDate) {
+        isValid = false;
+        showFieldError(field, 'Please select a date at least 2 business days from today');
+      }
+    }
+
+    return isValid;
+  }
+
+  function showFieldError(field, message) {
+    field.classList.add('border-red-500');
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message text-red-500 text-sm mt-1';
+    errorDiv.textContent = message;
+    field.parentNode.appendChild(errorDiv);
+  }
+
+  function validateForm() {
+    const requiredFields = document.querySelectorAll('[required]');
+    let isValid = true;
+
+    // Check if product is selected
+    if (!currentProduct) {
+      isValid = false;
+    }
+
+    // Check all required fields
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        isValid = false;
+      }
+    });
+
+    // Update button states
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const buyNowBtn = document.getElementById('buyNowBtn');
+
+    if (isValid) {
+      addToCartBtn.disabled = false;
+      addToCartBtn.classList.remove('bg-gray-400');
+      addToCartBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+      addToCartBtn.textContent = 'Add to Cart';
+
+      buyNowBtn.disabled = false;
+      buyNowBtn.classList.remove('bg-gray-400');
+      buyNowBtn.classList.add('bg-primary-500', 'hover:bg-primary-600');
+    } else {
+      addToCartBtn.disabled = true;
+      addToCartBtn.classList.add('bg-gray-400');
+      addToCartBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+
+      buyNowBtn.disabled = true;
+      buyNowBtn.classList.add('bg-gray-400');
+      buyNowBtn.classList.remove('bg-primary-500', 'hover:bg-primary-600');
+    }
+
+    return isValid;
+  }
+
+  function collectFormData() {
+    return {
+      id: Date.now(),
+      product: currentProduct,
+      customization: {
+        customName: document.getElementById('customName').value,
+        occasionType: document.getElementById('occasionType').value,
+        occasionNotes: document.getElementById('occasionNotes').value,
+        deliveryDate: document.getElementById('deliveryDate').value,
+        balloonStyle: document.getElementById('balloonStyle').value
+      },
+      customName: document.getElementById('customName').value,
+      occasionType: document.getElementById('occasionType').value,
+      occasionNotes: document.getElementById('occasionNotes').value,
+      deliveryDate: document.getElementById('deliveryDate').value,
+      balloonStyle: document.getElementById('balloonStyle').value,
+      quantity: currentQuantity,
+      unitPrice: basePrice + styleUpcharge,
+      totalPrice: (basePrice + styleUpcharge) * currentQuantity,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  function addToCart() {
+    if (!validateForm()) return;
+
+    const formData = collectFormData();
+
+    // Get existing cart or create new one
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    // Add item to cart
+    cart.push({
+      id: Date.now(),
+      ...formData,
+      timestamp: new Date().toISOString()
+    });
+
+    // Save cart
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    // Show success modal
+    showSuccessModal('Item added to cart successfully!');
+
+    // Track analytics event
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'add_to_cart', {
+        'event_category': 'ecommerce',
+        'event_label': currentProduct.name,
+        'value': formData.totalPrice
+      });
+    }
+  }
+
+  function buyNow() {
+    if (!validateForm()) return;
+
+    const formData = collectFormData();
+
+    // Store order for checkout
+    localStorage.setItem('currentOrder', JSON.stringify(formData));
+
+    // Track analytics event
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'begin_checkout', {
+        'event_category': 'ecommerce',
+        'event_label': currentProduct.name,
+        'value': formData.totalPrice
+      });
+    }
+
+    // Redirect to checkout immediately
+    window.location.href = '/checkout';
+  }
+
+  function showSuccessModal(message) {
+    document.getElementById('successMessage').textContent = message;
+    document.getElementById('successModal').classList.remove('hidden');
+    document.getElementById('successModal').classList.add('flex');
+  }
+</script>
+
+<style>
+  /* Additional styles for better form interaction */
+  .error-message {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Ensure images maintain aspect ratio and show full content */
+  #selectedProductImage {
+    border-radius: 0.75rem;
+    background: white;
+    padding: 1rem;
+  }
+
+  /* Custom scrollbar for better UX */
+  .space-y-6::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .space-y-6::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .space-y-6::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+
+  .space-y-6::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+</style>

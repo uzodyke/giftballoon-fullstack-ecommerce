@@ -1,0 +1,336 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import ProductCard from '@/components/ProductCard.astro';
+import { services, getServiceBySlug, getAllServiceSlugs } from '@/data/services';
+import { products } from '@/data/products';
+
+export async function getStaticPaths() {
+  return getAllServiceSlugs().map(slug => ({
+    params: { slug }
+  }));
+}
+
+const { slug } = Astro.params;
+const service = getServiceBySlug(slug!);
+
+if (!service) {
+  return Astro.redirect('/404');
+}
+
+// Get service-specific products
+const serviceProducts = service.popularProducts.map(id => products.find(p => p.id === id)).filter(Boolean);
+
+// Service-specific schema
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": service.name,
+  "description": service.longDescription,
+  "provider": {
+    "@type": "Organization",
+    "name": "Gifted Balloon",
+    "url": "https://giftedballoon.com"
+  },
+  "serviceType": "Balloon Arrangement Service",
+  "areaServed": {
+    "@type": "Country",
+    "name": "United Kingdom"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": service.price.replace('From £', ''),
+    "priceCurrency": "GBP",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": `${service.name} Options`,
+    "itemListElement": serviceProducts.map(product => ({
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Product",
+        "name": product?.name,
+        "image": `https://giftedballoon.com${product?.image}`
+      }
+    }))
+  }
+};
+
+// FAQ Schema
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": service.faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  }))
+};
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Services', href: '/services/weddings' },
+  { label: service.name }
+];
+---
+
+<BaseLayout
+  title={service.seoTitle}
+  description={service.seoDescription}
+  ogImage={service.image}
+  schema={[serviceSchema, faqSchema]}
+  keywords={`${service.slug} balloons, ${service.occasions.join(', ')}, balloon arrangements, personalised balloons`}
+  service={service.slug}
+>
+  <!-- Breadcrumb -->
+  <Breadcrumb items={breadcrumbItems} />
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Service Content -->
+        <div class="space-y-8">
+          <div class="space-y-4">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+              {service.name}
+            </h1>
+            <p class="text-xl text-gray-600 leading-relaxed">
+              {service.description}
+            </p>
+            <div class="text-2xl font-bold text-primary-600">
+              {service.price}
+            </div>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a
+              href="/shop"
+              class="bg-primary-500 hover:bg-primary-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200 text-center"
+            >
+              Customize Your Balloon
+            </a>
+            <a
+              href="/contact"
+              class="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200 text-center"
+            >
+              Get Custom Quote
+            </a>
+          </div>
+
+          <!-- Trust Badges -->
+          <div class="flex flex-wrap gap-6 text-sm text-gray-600">
+            <div class="flex items-center gap-2">
+              <span class="text-green-500">✓</span>
+              <span>Expert Design</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-green-500">✓</span>
+              <span>UK Delivery</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-green-500">✓</span>
+              <span>Custom Colors</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Image with curved border and full visibility -->
+        <div class="relative">
+          <div class="bg-white p-8 rounded-3xl shadow-2xl">
+            <img
+              src={service.image}
+              alt={service.name}
+              class="w-full h-96 object-contain rounded-2xl"
+              loading="eager"
+              width="400"
+              height="400"
+            />
+          </div>
+
+          <!-- Floating badge -->
+          <div class="absolute -top-4 -right-4 bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+            Popular Choice
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
+          What's Included
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Every {service.name.toLowerCase()} arrangement includes these premium features
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {service.features.map((feature, index) => (
+          <div class="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl">
+            <div class="flex-shrink-0 w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center font-bold">
+              {index + 1}
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-2">{feature}</h3>
+              <p class="text-gray-600 text-sm">Professional quality {feature.toLowerCase()} for your special occasion.</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- About This Service -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="prose prose-lg mx-auto">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">
+          About Our {service.name}
+        </h2>
+        <p class="text-gray-600 leading-relaxed text-lg">
+          {service.longDescription}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Occasions -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
+          Perfect For These Occasions
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        {service.occasions.map((occasion) => (
+          <div class="text-center p-4 bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl hover:shadow-lg transition-shadow duration-200">
+            <div class="text-3xl mb-2">🎉</div>
+            <h3 class="font-semibold text-gray-900">{occasion}</h3>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Products for This Service -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
+          Popular Balloons for {service.name}
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          These balloon designs are especially popular for {service.name.toLowerCase()}
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {serviceProducts.map((product) => (
+          product && <ProductCard product={product} showFullImage={true} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
+          Frequently Asked Questions
+        </h2>
+        <p class="text-xl text-gray-600">
+          Common questions about our {service.name.toLowerCase()}
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        {service.faqs.map((faq) => (
+          <details class="group bg-gray-50 rounded-lg p-6">
+            <summary class="cursor-pointer font-semibold text-lg text-gray-900 flex justify-between items-center">
+              {faq.question}
+              <span class="group-open:rotate-180 transition-transform duration-200">↓</span>
+            </summary>
+            <p class="mt-4 text-gray-600 leading-relaxed">
+              {faq.answer}
+            </p>
+          </details>
+        ))}
+      </div>
+
+      <div class="text-center mt-8">
+        <a
+          href="/contact"
+          class="inline-block text-primary-600 hover:text-primary-700 font-semibold"
+        >
+          Have more questions? Contact us →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Services -->
+  <section class="py-16 bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4 mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold">
+          Other Balloon Services
+        </h2>
+        <p class="text-xl opacity-90">
+          Explore our other specialized balloon arrangements
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {services.filter(s => s.id !== service.id).map((relatedService) => (
+          <a
+            href={`/services/${relatedService.slug}`}
+            class="block p-6 bg-white bg-opacity-10 rounded-2xl hover:bg-opacity-20 transition-all duration-200 text-center space-y-4"
+          >
+            <h3 class="font-bold text-lg">{relatedService.name}</h3>
+            <p class="text-sm opacity-90">{relatedService.description}</p>
+            <div class="text-sm font-semibold">{relatedService.price}</div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        Ready to Create Your {service.name}?
+      </h2>
+      <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+        Start customizing your perfect balloon arrangement today
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          href="/shop"
+          class="bg-primary-500 hover:bg-primary-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200"
+        >
+          Start Customizing
+        </a>
+        <a
+          href="/contact"
+          class="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200"
+        >
+          Get Expert Advice
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
