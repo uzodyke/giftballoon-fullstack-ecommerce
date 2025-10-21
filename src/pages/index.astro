@@ -399,7 +399,274 @@ const featuredProducts = [products[1], products[7]]; // Luxury and Golden Treasu
       </a>
     </div>
   </section>
+
+  <!-- Image Zoom Modal -->
+  <div id="imageZoomModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden items-center justify-center">
+    <div class="relative max-w-7xl max-h-screen mx-4 p-4">
+      <!-- Close Button -->
+      <button
+        id="closeZoomModal"
+        class="absolute top-4 right-4 z-60 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-full transition-colors"
+        aria-label="Close zoom view"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <!-- Product Info Header -->
+      <div class="absolute top-4 left-4 z-60 bg-white bg-opacity-90 rounded-lg p-4 max-w-md">
+        <h3 id="zoomProductName" class="text-xl font-bold text-gray-900 mb-2"></h3>
+        <p id="zoomProductDescription" class="text-gray-600 text-sm mb-2"></p>
+        <div class="text-primary-600 font-bold text-lg">£<span id="zoomProductPrice"></span></div>
+      </div>
+
+      <!-- Zoomable Image Container -->
+      <div class="zoom-container relative bg-white rounded-lg p-4 max-h-[90vh] overflow-hidden">
+        <img
+          id="zoomImage"
+          src=""
+          alt=""
+          class="zoom-image w-full h-full object-contain cursor-zoom-in transition-transform duration-300"
+          style="max-height: 80vh;"
+        />
+
+        <!-- Zoom Controls -->
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 bg-black bg-opacity-50 rounded-lg p-2">
+          <button id="zoomOut" class="text-white hover:text-gray-300 p-1" title="Zoom Out">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+            </svg>
+          </button>
+          <button id="resetZoom" class="text-white hover:text-gray-300 p-1" title="Reset Zoom">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+          <button id="zoomIn" class="text-white hover:text-gray-300 p-1" title="Zoom In">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </BaseLayout>
+
+<script>
+  // Global function to open zoom modal
+  function openImageZoom(button) {
+    const productName = button.dataset.productName;
+    const productImage = button.dataset.productImage;
+    const productDescription = button.dataset.productDescription;
+    const productPrice = button.dataset.productPrice;
+
+    const modal = document.getElementById('imageZoomModal');
+    const zoomImage = document.getElementById('zoomImage');
+    const productNameEl = document.getElementById('zoomProductName');
+    const productDescriptionEl = document.getElementById('zoomProductDescription');
+    const productPriceEl = document.getElementById('zoomProductPrice');
+
+    // Update modal content
+    zoomImage.src = productImage;
+    zoomImage.alt = productName;
+    productNameEl.textContent = productName;
+    productDescriptionEl.textContent = productDescription;
+    productPriceEl.textContent = productPrice;
+
+    // Reset zoom and position
+    window.resetZoom();
+
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    let currentZoom = 1;
+    let isDragging = false;
+    let startX, startY, startTranslateX = 0, startTranslateY = 0;
+    let currentTranslateX = 0, currentTranslateY = 0;
+
+    // Modal controls
+    const modal = document.getElementById('imageZoomModal');
+    const closeBtn = document.getElementById('closeZoomModal');
+    const zoomImage = document.getElementById('zoomImage');
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
+    const resetZoomBtn = document.getElementById('resetZoom');
+
+    // Close modal
+    closeBtn?.addEventListener('click', closeZoomModal);
+    modal?.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeZoomModal();
+      }
+    });
+
+    // Keyboard controls
+    document.addEventListener('keydown', function(e) {
+      if (!modal?.classList.contains('hidden')) {
+        switch(e.key) {
+          case 'Escape':
+            closeZoomModal();
+            break;
+          case '+':
+          case '=':
+            zoomIn();
+            break;
+          case '-':
+            zoomOut();
+            break;
+          case '0':
+            resetZoom();
+            break;
+        }
+      }
+    });
+
+    // Zoom controls
+    zoomInBtn?.addEventListener('click', zoomIn);
+    zoomOutBtn?.addEventListener('click', zoomOut);
+    resetZoomBtn?.addEventListener('click', resetZoom);
+
+    // Mouse wheel zoom
+    zoomImage?.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      zoom(currentZoom + delta, e.offsetX, e.offsetY);
+    });
+
+    // Click to zoom
+    zoomImage?.addEventListener('click', function(e) {
+      if (currentZoom === 1) {
+        zoom(2, e.offsetX, e.offsetY);
+      } else {
+        resetZoom();
+      }
+    });
+
+    // Mouse drag for panning
+    zoomImage?.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', endDrag);
+
+    // Touch support
+    zoomImage?.addEventListener('touchstart', startTouch, { passive: false });
+    zoomImage?.addEventListener('touchmove', touchMove, { passive: false });
+    zoomImage?.addEventListener('touchend', endTouch);
+
+    function closeZoomModal() {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+      resetZoom();
+    }
+
+    function zoom(scale, originX = null, originY = null) {
+      currentZoom = Math.max(0.5, Math.min(4, scale));
+      zoomImage.style.cursor = currentZoom === 1 ? 'zoom-in' : 'zoom-out';
+      updateImageTransform();
+    }
+
+    function zoomIn() {
+      zoom(currentZoom + 0.25);
+    }
+
+    function zoomOut() {
+      zoom(currentZoom - 0.25);
+    }
+
+    function resetZoom() {
+      currentZoom = 1;
+      currentTranslateX = 0;
+      currentTranslateY = 0;
+      updateImageTransform();
+      zoomImage.style.cursor = 'zoom-in';
+    }
+
+    // Make resetZoom globally available
+    window.resetZoom = resetZoom;
+
+    function updateImageTransform() {
+      zoomImage.style.transform = `scale(${currentZoom}) translate(${currentTranslateX}px, ${currentTranslateY}px)`;
+    }
+
+    // Drag functionality
+    function startDrag(e) {
+      if (currentZoom <= 1) return;
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startTranslateX = currentTranslateX;
+      startTranslateY = currentTranslateY;
+      zoomImage.style.cursor = 'grabbing';
+    }
+
+    function drag(e) {
+      if (!isDragging || currentZoom <= 1) return;
+      e.preventDefault();
+
+      const deltaX = (e.clientX - startX) / currentZoom;
+      const deltaY = (e.clientY - startY) / currentZoom;
+
+      currentTranslateX = startTranslateX + deltaX;
+      currentTranslateY = startTranslateY + deltaY;
+
+      updateImageTransform();
+    }
+
+    function endDrag() {
+      isDragging = false;
+      zoomImage.style.cursor = currentZoom === 1 ? 'zoom-in' : 'zoom-out';
+    }
+
+    // Touch support
+    let initialTouchDistance = 0;
+    let initialZoom = 1;
+
+    function startTouch(e) {
+      if (e.touches.length === 2) {
+        initialTouchDistance = getTouchDistance(e.touches[0], e.touches[1]);
+        initialZoom = currentZoom;
+      } else if (e.touches.length === 1 && currentZoom > 1) {
+        startDrag({
+          clientX: e.touches[0].clientX,
+          clientY: e.touches[0].clientY
+        });
+      }
+    }
+
+    function touchMove(e) {
+      e.preventDefault();
+
+      if (e.touches.length === 2) {
+        const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+        const scale = (currentDistance / initialTouchDistance) * initialZoom;
+        zoom(scale);
+      } else if (e.touches.length === 1 && isDragging) {
+        drag({
+          clientX: e.touches[0].clientX,
+          clientY: e.touches[0].clientY,
+          preventDefault: () => {}
+        });
+      }
+    }
+
+    function endTouch() {
+      endDrag();
+      initialTouchDistance = 0;
+    }
+
+    function getTouchDistance(touch1, touch2) {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+  });
+</script>
 
 <style>
   .animate-fade-in {
@@ -437,5 +704,69 @@ const featuredProducts = [products[1], products[7]]; // Luxury and Golden Treasu
     border-radius: 1rem;
     padding: 1rem;
     background: white;
+  }
+
+  /* Zoom Modal Styles */
+  .zoom-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+
+  .zoom-image {
+    max-width: 100%;
+    max-height: 100%;
+    transition: transform 0.3s ease;
+    transform-origin: center center;
+  }
+
+  .zoom-image:hover {
+    cursor: zoom-in;
+  }
+
+  .zoom-image.zoomed {
+    cursor: zoom-out;
+  }
+
+  .zoom-image.dragging {
+    cursor: grabbing !important;
+  }
+
+  /* Prevent text selection during drag */
+  #imageZoomModal.dragging {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  /* Smooth transitions for zoom controls */
+  #imageZoomModal button {
+    transition: all 0.2s ease;
+  }
+
+  #imageZoomModal button:hover {
+    transform: scale(1.1);
+  }
+
+  /* Responsive adjustments for mobile */
+  @media (max-width: 640px) {
+    .zoom-container {
+      max-height: 85vh;
+    }
+
+    #imageZoomModal .absolute.top-4.left-4 {
+      position: relative;
+      top: auto;
+      left: auto;
+      margin-bottom: 1rem;
+      max-width: none;
+    }
+
+    #imageZoomModal .absolute.bottom-4 {
+      bottom: 2rem;
+    }
   }
 </style>
