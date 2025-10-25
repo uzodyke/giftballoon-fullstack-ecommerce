@@ -1,5 +1,4 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".vercel/output",
-  "framework": null
+  "framework": null,
+  "buildCommand": "npm run build && node -e \"const fs = require('fs'); const config = JSON.parse(fs.readFileSync('.vercel/output/functions/_render.func/.vc-config.json', 'utf8')); config.runtime = 'nodejs20.x'; fs.writeFileSync('.vercel/output/functions/_render.func/.vc-config.json', JSON.stringify(config, null, 2));\""
 }
