@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
+import { stripeConfig } from '@/config/stripe';
 
 const breadcrumbItems = [
   { label: 'Home', href: '/' },
@@ -16,6 +17,8 @@ const checkoutSchema = {
   "description": "Complete your personalised balloon order with secure payment",
   "url": "https://giftedballoon.com/checkout"
 };
+
+export const prerender = false;
 ---
 
 <BaseLayout
@@ -146,7 +149,7 @@ const checkoutSchema = {
                     name="phone"
                     required
                     class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
-                    placeholder="+44 7XXX XXXXXX"
+                    placeholder="+44 7xxx xxx xxx"
                   />
                 </div>
               </div>
@@ -158,20 +161,20 @@ const checkoutSchema = {
                 </h2>
 
                 <div>
-                  <label for="deliveryAddress" class="block text-sm font-semibold text-gray-900 mb-2">
+                  <label for="address" class="block text-sm font-semibold text-gray-900 mb-2">
                     Delivery Address <span class="text-red-500">*</span>
                   </label>
-                  <textarea
-                    id="deliveryAddress"
-                    name="deliveryAddress"
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
                     required
-                    rows="3"
-                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors resize-none"
-                    placeholder="Enter full delivery address..."
-                  ></textarea>
+                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                    placeholder="Street address, apartment, suite, etc."
+                  />
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
+                <div class="grid md:grid-cols-3 gap-6">
                   <div>
                     <label for="city" class="block text-sm font-semibold text-gray-900 mb-2">
                       City <span class="text-red-500">*</span>
@@ -182,7 +185,20 @@ const checkoutSchema = {
                       name="city"
                       required
                       class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
-                      placeholder="London, Manchester, etc."
+                      placeholder="London"
+                    />
+                  </div>
+
+                  <div>
+                    <label for="county" class="block text-sm font-semibold text-gray-900 mb-2">
+                      County/State
+                    </label>
+                    <input
+                      type="text"
+                      id="county"
+                      name="county"
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                      placeholder="Greater London"
                     />
                   </div>
 
@@ -203,26 +219,26 @@ const checkoutSchema = {
 
                 <div>
                   <label for="deliveryNotes" class="block text-sm font-semibold text-gray-900 mb-2">
-                    Special Delivery Instructions (Optional)
+                    Delivery Notes (Optional)
                   </label>
                   <textarea
                     id="deliveryNotes"
                     name="deliveryNotes"
-                    rows="2"
-                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors resize-none"
-                    placeholder="Any special instructions for delivery..."
+                    rows="3"
+                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+                    placeholder="Special delivery instructions..."
                   ></textarea>
                 </div>
               </div>
 
-              <!-- Payment Method -->
+              <!-- Payment Method Selection -->
               <div class="space-y-6">
                 <h2 class="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">
                   Payment Method
                 </h2>
 
-                <!-- Payment Options -->
                 <div class="space-y-4">
+                  <!-- Credit/Debit Card -->
                   <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
                     <label class="flex items-center cursor-pointer">
                       <input
@@ -232,14 +248,16 @@ const checkoutSchema = {
                         checked
                         class="w-4 h-4 text-primary-600 focus:ring-primary-500"
                       />
-                      <span class="ml-3 font-semibold">Credit/Debit Card</span>
+                      <span class="ml-3 font-semibold text-gray-900">Credit/Debit Card</span>
                       <div class="ml-auto flex space-x-2">
                         <span class="text-2xl">💳</span>
-                        <span class="text-sm text-gray-500">Visa, Mastercard, Amex</span>
+                        <span class="text-blue-600 font-bold">VISA</span>
+                        <span class="text-red-600 font-bold">MC</span>
                       </div>
                     </label>
                   </div>
 
+                  <!-- PayPal -->
                   <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
                     <label class="flex items-center cursor-pointer">
                       <input
@@ -248,88 +266,47 @@ const checkoutSchema = {
                         value="paypal"
                         class="w-4 h-4 text-primary-600 focus:ring-primary-500"
                       />
-                      <span class="ml-3 font-semibold">PayPal</span>
+                      <span class="ml-3 font-semibold text-gray-900">PayPal</span>
                       <div class="ml-auto">
-                        <span class="text-2xl">💰</span>
+                        <span class="text-blue-600 font-bold text-lg">PayPal</span>
                       </div>
                     </label>
                   </div>
 
+                  <!-- Apple Pay / Google Pay -->
                   <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
                     <label class="flex items-center cursor-pointer">
                       <input
                         type="radio"
                         name="paymentMethod"
-                        value="applepay"
+                        value="express"
                         class="w-4 h-4 text-primary-600 focus:ring-primary-500"
                       />
-                      <span class="ml-3 font-semibold">Apple Pay / Google Pay</span>
-                      <div class="ml-auto">
-                        <span class="text-2xl">📱</span>
+                      <span class="ml-3 font-semibold text-gray-900">Express Checkout</span>
+                      <div class="ml-auto flex space-x-2">
+                        <span class="text-gray-800 font-bold">🍎 Pay</span>
+                        <span class="text-blue-600 font-bold">G Pay</span>
                       </div>
                     </label>
                   </div>
                 </div>
+              </div>
 
-                <!-- Card Details (shown when card is selected) -->
-                <div id="cardDetails" class="space-y-4 bg-gray-50 p-6 rounded-lg">
-                  <div>
-                    <label for="cardNumber" class="block text-sm font-semibold text-gray-900 mb-2">
-                      Card Number <span class="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="cardNumber"
-                      name="cardNumber"
-                      placeholder="1234 5678 9012 3456"
-                      maxlength="19"
-                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
-                    />
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <label for="expiryDate" class="block text-sm font-semibold text-gray-900 mb-2">
-                        Expiry Date <span class="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="expiryDate"
-                        name="expiryDate"
-                        placeholder="MM/YY"
-                        maxlength="5"
-                        class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label for="cvv" class="block text-sm font-semibold text-gray-900 mb-2">
-                        CVV <span class="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="cvv"
-                        name="cvv"
-                        placeholder="123"
-                        maxlength="4"
-                        class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label for="cardholderName" class="block text-sm font-semibold text-gray-900 mb-2">
-                      Cardholder Name <span class="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="cardholderName"
-                      name="cardholderName"
-                      placeholder="Name as shown on card"
-                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
-                    />
-                  </div>
+              <!-- Payment Details -->
+              <div id="paymentDetails" class="space-y-6">
+                <!-- Stripe Elements will be mounted here -->
+                <div id="card-element" class="p-4 border-2 border-gray-200 rounded-lg bg-gray-50">
+                  <!-- Card element placeholder -->
                 </div>
+
+                <!-- PayPal Container -->
+                <div id="paypal-button-container" class="hidden"></div>
+
+                <!-- Express Checkout Container -->
+                <div id="express-checkout-element" class="hidden"></div>
+
+                <!-- Payment Errors -->
+                <div id="payment-errors" class="text-red-600 text-sm hidden"></div>
               </div>
 
               <!-- Terms and Complete Order -->
@@ -351,9 +328,10 @@ const checkoutSchema = {
                 <button
                   type="submit"
                   id="completeOrderBtn"
-                  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-4 rounded-lg font-bold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-4 rounded-lg font-bold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Complete Order & Pay
+                  <span id="button-text">Complete Order & Pay</span>
+                  <span id="button-spinner" class="hidden">Processing...</span>
                 </button>
 
                 <!-- Alternative Contact -->
@@ -413,14 +391,34 @@ const checkoutSchema = {
   </div>
 </BaseLayout>
 
-<script>
+<!-- Load Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<!-- Load PayPal SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id=Acgd4Q8DkEhEwPaWWg6Q4QwPSBLvXgJ3o4RXcFz7HrBKWq3IfO0r4DdJGF9Y6Og6Lv2HJI4Bs_-dFGHk&currency=GBP&components=buttons,payment-fields"></script>
+
+<script define:vars={{ stripePublishableKey: stripeConfig.getPublishableKey() }}>
+  // Global variables
+  let stripe = null;
+  let elements = null;
+  let paymentElement = null;
+  let expressCheckoutElement = null;
   let currentOrder = null;
   let cart = [];
+  let currentTotal = 0;
 
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', async function() {
+    // Initialize Stripe
+    stripe = Stripe(stripePublishableKey);
+
+    // Load order data and setup
     loadOrderData();
     setupEventListeners();
     calculateTotals();
+
+    // Initialize payment methods
+    await initializeStripeElements();
+    initializePayPal();
   });
 
   function loadOrderData() {
@@ -464,13 +462,13 @@ const checkoutSchema = {
           />
           <div class="flex-1">
             <h3 class="font-semibold text-gray-900">${item.product?.name || item.name}</h3>
-            <p class="text-sm text-gray-600">Custom Text: "${item.customization?.customName || item.customName}"</p>
-            <p class="text-sm text-gray-600">Occasion: ${item.customization?.occasionType || item.occasionType}</p>
-            <p class="text-sm text-gray-600">Delivery: ${item.customization?.deliveryDate || item.deliveryDate}</p>
-            <p class="text-sm text-gray-600">Quantity: ${item.quantity}</p>
+            <p class="text-sm text-gray-600">Custom Text: "${item.customization?.customName || item.customName || 'None'}"</p>
+            <p class="text-sm text-gray-600">Occasion: ${item.customization?.occasionType || item.occasionType || 'General'}</p>
+            <p class="text-sm text-gray-600">Delivery: ${item.customization?.deliveryDate || item.deliveryDate || 'Standard'}</p>
+            <p class="text-sm text-gray-600">Quantity: ${item.quantity || 1}</p>
           </div>
           <div class="text-right">
-            <p class="font-bold text-primary-600">£${(item.totalPrice || item.unitPrice * item.quantity).toFixed(2)}</p>
+            <p class="font-bold text-primary-600">£${(item.totalPrice || (item.unitPrice || item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
           </div>
         </div>
       </div>
@@ -478,257 +476,212 @@ const checkoutSchema = {
   }
 
   function calculateTotals() {
-    const subtotal = cart.reduce((sum, item) => sum + (item.totalPrice || item.unitPrice * item.quantity), 0);
+    const subtotal = cart.reduce((sum, item) => {
+      const price = item.totalPrice || (item.unitPrice || item.price || 0) * (item.quantity || 1);
+      return sum + price;
+    }, 0);
+
     const deliveryFee = subtotal >= 50 ? 0 : 5.99;
     const grandTotal = subtotal + deliveryFee;
+
+    currentTotal = grandTotal;
 
     document.getElementById('subtotal').textContent = `£${subtotal.toFixed(2)}`;
     document.getElementById('deliveryFee').textContent = deliveryFee === 0 ? 'FREE' : `£${deliveryFee.toFixed(2)}`;
     document.getElementById('grandTotal').textContent = `£${grandTotal.toFixed(2)}`;
   }
 
+  async function initializeStripeElements() {
+    try {
+      // Create payment intent
+      const response = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: Math.round(currentTotal * 100), // Convert to pence
+          currency: 'gbp',
+          order_details: {
+            cart: cart,
+            customer: {},
+            delivery: {}
+          }
+        }),
+      });
+
+      const { client_secret } = await response.json();
+
+      // Create elements instance
+      elements = stripe.elements({
+        clientSecret: client_secret,
+        appearance: {
+          theme: 'stripe',
+          variables: {
+            colorPrimary: '#ff6b9d',
+            colorBackground: '#ffffff',
+            colorText: '#374151',
+            fontFamily: 'system-ui, sans-serif',
+          }
+        }
+      });
+
+      // Create and mount payment element
+      paymentElement = elements.create('payment');
+      paymentElement.mount('#card-element');
+
+      // Create express checkout element
+      expressCheckoutElement = elements.create('expressCheckout', {
+        buttonType: {
+          applePay: 'buy',
+          googlePay: 'buy'
+        }
+      });
+      expressCheckoutElement.mount('#express-checkout-element');
+
+    } catch (error) {
+      console.error('Error initializing Stripe:', error);
+      document.getElementById('payment-errors').textContent = 'Payment system unavailable. Please try again later.';
+      document.getElementById('payment-errors').classList.remove('hidden');
+    }
+  }
+
+  function initializePayPal() {
+    if (window.paypal) {
+      paypal.Buttons({
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                value: currentTotal.toFixed(2),
+                currency_code: 'GBP'
+              },
+              description: 'Gifted Balloon Order'
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            showOrderSuccess('PayPal', details.id);
+          });
+        },
+        onError: function(err) {
+          showPaymentError('PayPal payment failed. Please try again.');
+        }
+      }).render('#paypal-button-container');
+    }
+  }
+
   function setupEventListeners() {
     // Payment method toggle
     const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
-    const cardDetails = document.getElementById('cardDetails');
+    const cardElement = document.getElementById('card-element');
+    const paypalContainer = document.getElementById('paypal-button-container');
+    const expressContainer = document.getElementById('express-checkout-element');
 
     paymentMethods.forEach(method => {
       method.addEventListener('change', function() {
+        // Hide all payment containers
+        cardElement.classList.add('hidden');
+        paypalContainer.classList.add('hidden');
+        expressContainer.classList.add('hidden');
+
+        // Show selected payment method
         if (this.value === 'card') {
-          cardDetails.style.display = 'block';
-        } else {
-          cardDetails.style.display = 'none';
+          cardElement.classList.remove('hidden');
+        } else if (this.value === 'paypal') {
+          paypalContainer.classList.remove('hidden');
+        } else if (this.value === 'express') {
+          expressContainer.classList.remove('hidden');
         }
       });
     });
 
-    // Form validation and submission
-    const checkoutForm = document.getElementById('checkoutForm');
-    checkoutForm.addEventListener('submit', handleFormSubmission);
+    // Form submission
+    document.getElementById('checkoutForm').addEventListener('submit', handleFormSubmit);
 
-    // Card number formatting
-    const cardNumberInput = document.getElementById('cardNumber');
-    cardNumberInput.addEventListener('input', function() {
-      let value = this.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
-      let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-      this.value = formattedValue;
+    // Success modal buttons
+    document.getElementById('viewOrderBtn').addEventListener('click', () => {
+      window.location.href = '/order-confirmation';
     });
 
-    // Expiry date formatting
-    const expiryInput = document.getElementById('expiryDate');
-    expiryInput.addEventListener('input', function() {
-      let value = this.value.replace(/\D/g, '');
-      if (value.length >= 3) {
-        value = value.slice(0, 2) + '/' + value.slice(2, 4);
-      }
-      this.value = value;
-    });
-
-    // CVV validation
-    const cvvInput = document.getElementById('cvv');
-    cvvInput.addEventListener('input', function() {
-      this.value = this.value.replace(/\D/g, '');
-    });
-
-    // Modal handlers
-    document.getElementById('viewOrderBtn').addEventListener('click', function() {
-      // In a real app, this would redirect to an order tracking page
-      alert('Order tracking feature coming soon!');
-    });
-
-    document.getElementById('continueShoppingBtn').addEventListener('click', function() {
+    document.getElementById('continueShoppingBtn').addEventListener('click', () => {
       window.location.href = '/shop';
     });
   }
 
-  function handleFormSubmission(e) {
-    e.preventDefault();
+  async function handleFormSubmit(event) {
+    event.preventDefault();
 
-    // Validate form
-    if (!validateCheckoutForm()) {
-      return;
+    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+    if (selectedPaymentMethod === 'card') {
+      await handleStripePayment();
+    } else if (selectedPaymentMethod === 'paypal') {
+      // PayPal handles its own submission
+      showPaymentError('Please use the PayPal button to complete your payment.');
+    } else if (selectedPaymentMethod === 'express') {
+      // Express checkout handles its own submission
+      showPaymentError('Please use the Apple Pay or Google Pay button to complete your payment.');
     }
-
-    // Show loading state
-    const submitBtn = document.getElementById('completeOrderBtn');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Processing...';
-    submitBtn.disabled = true;
-
-    // Simulate payment processing
-    setTimeout(() => {
-      processOrder();
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
-    }, 2000);
   }
 
-  function validateCheckoutForm() {
-    const requiredFields = document.querySelectorAll('[required]');
-    let isValid = true;
+  async function handleStripePayment() {
+    setLoading(true);
 
-    requiredFields.forEach(field => {
-      if (!field.value.trim()) {
-        field.classList.add('border-red-500');
-        isValid = false;
-      } else {
-        field.classList.remove('border-red-500');
-      }
-    });
-
-    // Validate email
-    const email = document.getElementById('email').value;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      document.getElementById('email').classList.add('border-red-500');
-      isValid = false;
-    }
-
-    // Validate payment method specific fields
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-    if (paymentMethod === 'card') {
-      const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
-      const expiryDate = document.getElementById('expiryDate').value;
-      const cvv = document.getElementById('cvv').value;
-
-      if (cardNumber.length < 13 || cardNumber.length > 19) {
-        document.getElementById('cardNumber').classList.add('border-red-500');
-        isValid = false;
-      }
-
-      if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
-        document.getElementById('expiryDate').classList.add('border-red-500');
-        isValid = false;
-      }
-
-      if (cvv.length < 3 || cvv.length > 4) {
-        document.getElementById('cvv').classList.add('border-red-500');
-        isValid = false;
-      }
-    }
-
-    if (!isValid) {
-      alert('Please fill in all required fields correctly.');
-    }
-
-    return isValid;
-  }
-
-  function processOrder() {
-    // Calculate totals
-    const subtotal = cart.reduce((sum, item) => sum + (item.totalPrice || item.unitPrice * item.quantity), 0);
-    const deliveryFee = subtotal >= 50 ? 0 : 5.99;
-    const grandTotal = subtotal + deliveryFee;
-
-    // Generate order reference
-    const orderRef = 'GB-' + new Date().getFullYear() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-
-    // Collect order data
-    const orderData = {
-      reference: orderRef,
-      items: cart,
-      customer: {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value
-      },
-      delivery: {
-        address: document.getElementById('deliveryAddress').value,
-        city: document.getElementById('city').value,
-        postcode: document.getElementById('postcode').value,
-        country: 'United Kingdom',
-        date: document.getElementById('deliveryDate').value,
-        timeSlot: document.getElementById('timeSlot').value,
-        instructions: document.getElementById('deliveryNotes').value
-      },
-      payment: {
-        method: document.querySelector('input[name="paymentMethod"]:checked').value,
-        total: grandTotal
-      },
-      subtotal: subtotal,
-      deliveryFee: deliveryFee,
-      total: grandTotal,
-      timestamp: new Date().toISOString()
-    };
-
-    // Store order in localStorage (in a real app, this would be sent to a server)
-    let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    orders.push(orderData);
-    localStorage.setItem('orders', JSON.stringify(orders));
-
-    // Store order in session storage for confirmation page
-    sessionStorage.setItem('lastOrder', JSON.stringify(orderData));
-
-    // Track analytics
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'purchase', {
-        'transaction_id': orderRef,
-        'value': grandTotal,
-        'currency': 'GBP',
-        'items': cart.map(item => ({
-          'item_id': item.product?.id || item.id,
-          'item_name': item.product?.name || item.name,
-          'category': 'Personalised Balloons',
-          'quantity': item.quantity,
-          'price': item.unitPrice
-        }))
+    try {
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: window.location.origin + '/order-confirmation',
+        },
+        redirect: 'if_required'
       });
+
+      if (error) {
+        showPaymentError(error.message);
+      } else {
+        showOrderSuccess('Stripe', 'payment_intent_success');
+      }
+    } catch (err) {
+      showPaymentError('Payment processing failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
+  }
 
-    // Send confirmation email (in a real app)
-    console.log('Order processed:', orderData);
+  function setLoading(isLoading) {
+    const button = document.getElementById('completeOrderBtn');
+    const buttonText = document.getElementById('button-text');
+    const buttonSpinner = document.getElementById('button-spinner');
 
-    // Redirect to confirmation page
-    window.location.href = '/order-confirmation';
+    button.disabled = isLoading;
+    buttonText.classList.toggle('hidden', isLoading);
+    buttonSpinner.classList.toggle('hidden', !isLoading);
+  }
 
-    // Optional: Send order data to your backend
-    // fetch('/api/orders', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(orderData)
-    // });
+  function showPaymentError(message) {
+    const errorElement = document.getElementById('payment-errors');
+    errorElement.textContent = message;
+    errorElement.classList.remove('hidden');
+    setTimeout(() => {
+      errorElement.classList.add('hidden');
+    }, 5000);
+  }
+
+  function showOrderSuccess(paymentMethod, transactionId) {
+    // Clear cart
+    localStorage.removeItem('cart');
+    localStorage.removeItem('currentOrder');
+
+    // Update modal with order details
+    document.getElementById('orderReference').textContent = `#GB-${Date.now()}`;
+    document.getElementById('orderConfirmationMessage').textContent =
+      `Thank you for your order! Payment via ${paymentMethod} was successful. Your personalised balloon will be prepared and delivered on your chosen date.`;
+
+    // Show success modal
+    document.getElementById('orderSuccessModal').classList.remove('hidden');
+    document.getElementById('orderSuccessModal').classList.add('flex');
   }
 </script>
-
-<style>
-  /* Additional styles for checkout page */
-  .checkout-step {
-    transition: all 0.3s ease;
-  }
-
-  .checkout-step.active {
-    border-color: #ff6b9d;
-    background-color: #fff1f8;
-  }
-
-  /* Custom radio button styling */
-  input[type="radio"]:checked + span {
-    color: #ff6b9d;
-  }
-
-  /* Loading state */
-  .loading {
-    position: relative;
-    pointer-events: none;
-  }
-
-  .loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-    border: 2px solid #ffffff;
-    border-top: 2px solid transparent;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-</style>
+</BaseLayout>
