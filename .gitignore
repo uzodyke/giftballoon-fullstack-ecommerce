@@ -39,3 +39,6 @@ coverage/
 
 # Build files
 preview.log
+
+# Vercel build outputs
+.vercel/
