@@ -6,7 +6,8 @@ import vercel from '@astrojs/vercel/serverless';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://giftedballoon.com',
-  output: 'static',
+  output: 'hybrid',
+  adapter: vercel(),
   integrations: [
     sitemap({
       changefreq: 'weekly',
