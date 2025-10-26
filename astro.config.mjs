@@ -7,9 +7,7 @@ import vercel from '@astrojs/vercel/serverless';
 export default defineConfig({
   site: 'https://giftedballoon.com',
   output: 'hybrid',
-  adapter: vercel({
-    runtime: 'nodejs20.x'
-  }),
+  adapter: vercel(),
   integrations: [
     sitemap({
       changefreq: 'weekly',
