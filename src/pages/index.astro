@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ProductCard from '@/components/ProductCard.astro';
+import ZoomableImageViewer from '@/components/ZoomableImageViewer.astro';
 import { products } from '@/data/products';
 
 // SEO Schema for Homepage
@@ -770,3 +771,6 @@ const featuredProducts = [products[1], products[7]]; // Luxury and Golden Treasu
     }
   }
 </style>
+
+<!-- Zoomable Image Viewer -->
+<ZoomableImageViewer src="" alt="" />

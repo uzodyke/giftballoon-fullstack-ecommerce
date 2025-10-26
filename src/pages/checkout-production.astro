@@ -1,0 +1,687 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Shop', href: '/shop' },
+  { label: 'Checkout' }
+];
+
+const checkoutSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Checkout - Personalised Balloons",
+  "description": "Complete your personalised balloon order with secure payment",
+  "url": "https://giftedballoon.com/checkout"
+};
+---
+
+<BaseLayout
+  title="Secure Checkout | Complete Your Balloon Order | Gifted Balloon"
+  description="Complete your personalised balloon order with secure payment. Apple Pay, Google Pay, and all major cards accepted."
+  ogImage="/images/5_Love_bouquet_30.png"
+  schema={checkoutSchema}
+  keywords="secure checkout, balloon payment, Apple Pay, Google Pay, credit card payment"
+>
+  <!-- Breadcrumb -->
+  <Breadcrumb items={breadcrumbItems} />
+
+  <!-- Checkout Page -->
+  <section class="py-16 bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-2xl p-8 shadow-xl">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">Secure Checkout</h1>
+
+        <!-- Order Summary -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-8">
+          <h2 class="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
+          <div id="orderSummary" class="space-y-4">
+            <!-- Items will be loaded here -->
+          </div>
+          <div class="border-t border-gray-200 pt-4 mt-4">
+            <div class="flex justify-between text-lg font-bold text-primary-600">
+              <span>Total:</span>
+              <span id="grandTotal">£0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Information Form -->
+        <form id="customerForm" class="space-y-6 mb-8">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <label for="firstName" class="block text-sm font-semibold text-gray-900 mb-2">
+                First Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                required
+                class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div>
+              <label for="lastName" class="block text-sm font-semibold text-gray-900 mb-2">
+                Last Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                required
+                class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                placeholder="Enter your last name"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-semibold text-gray-900 mb-2">
+              Email Address <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+              placeholder="your.email@example.com"
+            />
+          </div>
+
+          <div>
+            <label for="phone" class="block text-sm font-semibold text-gray-900 mb-2">
+              Phone Number <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              required
+              class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+              placeholder="+44 7xxx xxx xxx"
+            />
+          </div>
+
+          <div>
+            <label for="address" class="block text-sm font-semibold text-gray-900 mb-2">
+              Delivery Address <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              required
+              class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+              placeholder="Street address, apartment, suite, etc."
+            />
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-6">
+            <div>
+              <label for="city" class="block text-sm font-semibold text-gray-900 mb-2">
+                City <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                required
+                class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                placeholder="London"
+              />
+            </div>
+            <div>
+              <label for="county" class="block text-sm font-semibold text-gray-900 mb-2">
+                County/State
+              </label>
+              <input
+                type="text"
+                id="county"
+                name="county"
+                class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                placeholder="Greater London"
+              />
+            </div>
+            <div>
+              <label for="postcode" class="block text-sm font-semibold text-gray-900 mb-2">
+                Postcode <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="postcode"
+                name="postcode"
+                required
+                class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                placeholder="SW1A 1AA"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="deliveryNotes" class="block text-sm font-semibold text-gray-900 mb-2">
+              Delivery Notes (Optional)
+            </label>
+            <textarea
+              id="deliveryNotes"
+              name="deliveryNotes"
+              rows="3"
+              class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+              placeholder="Special delivery instructions..."
+            ></textarea>
+          </div>
+        </form>
+
+        <!-- Payment Methods -->
+        <div class="space-y-6">
+          <h2 class="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">
+            Choose Payment Method
+          </h2>
+
+          <!-- Payment Status Messages -->
+          <div id="payment-status" class="hidden p-4 rounded-lg">
+            <div id="status-message"></div>
+          </div>
+
+          <!-- Express Checkout (Apple Pay, Google Pay) -->
+          <div id="express-checkout-section" class="p-6 border-2 border-primary-200 rounded-lg bg-primary-50">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">⚡ Express Checkout</h3>
+            <div id="express-checkout-element" class="mb-4">
+              <!-- Express checkout buttons will appear here -->
+            </div>
+            <p class="text-sm text-gray-600">Pay instantly with Apple Pay, Google Pay, or Link</p>
+          </div>
+
+          <!-- Standard Payment -->
+          <div class="p-6 border-2 border-gray-200 rounded-lg">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">💳 Credit/Debit Card</h3>
+            <div id="payment-element" class="mb-4">
+              <!-- Payment element will be mounted here -->
+            </div>
+            <div id="payment-errors" class="text-red-600 text-sm hidden mb-4"></div>
+          </div>
+
+          <!-- PayPal -->
+          <div class="p-6 border-2 border-gray-200 rounded-lg">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">💙 PayPal</h3>
+            <div id="paypal-button-container">
+              <!-- PayPal button will be rendered here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-8">
+          <button
+            id="submit-payment"
+            onclick="handlePaymentSubmit()"
+            class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-4 rounded-lg font-bold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            🔒 Complete Secure Payment
+          </button>
+
+          <div class="flex items-center justify-center space-x-4 text-sm text-gray-600 mt-4">
+            <div class="flex items-center">
+              <span class="text-green-500 mr-1">🔒</span>
+              <span>SSL Secure</span>
+            </div>
+            <div class="flex items-center">
+              <span class="text-blue-500 mr-1">💳</span>
+              <span>PCI Compliant</span>
+            </div>
+            <div class="flex items-center">
+              <span class="text-purple-500 mr-1">⚡</span>
+              <span>Instant Processing</span>
+            </div>
+          </div>
+
+          <!-- Error Messages -->
+          <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mt-4"></div>
+
+          <!-- Success Messages -->
+          <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg mt-4"></div>
+        </div>
+
+        <!-- Alternative Contact -->
+        <div class="text-center pt-6 border-t border-gray-200 mt-8">
+          <p class="text-gray-600 mb-4">Need help with your order?</p>
+          <div class="flex justify-center space-x-4">
+            <a
+              href="tel:+447459665002"
+              class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+            >
+              📞 Call +44 7459 665002
+            </a>
+            <a
+              href="mailto:info@giftedballoon.com"
+              class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+            >
+              📧 Email Us
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<!-- External Scripts -->
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=sb&currency=GBP&components=buttons"></script>
+
+<script is:inline>
+// Global variables
+var stripeGlobal = null;
+var elementsGlobal = null;
+var paymentElementGlobal = null;
+var expressCheckoutElementGlobal = null;
+var cart = [];
+var currentTotal = 0;
+var isInitialized = false;
+
+// Initialize everything when DOM is ready
+function initializeCheckout() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupCheckout);
+  } else {
+    setupCheckout();
+  }
+}
+
+function setupCheckout() {
+  console.log('Checkout initializing...');
+
+  // Load order data first
+  loadOrderData();
+
+  // Wait for Stripe to load, then initialize payment methods
+  waitForStripe();
+}
+
+function waitForStripe() {
+  var attempts = 0;
+  var maxAttempts = 50; // 5 seconds
+
+  function checkStripe() {
+    attempts++;
+    if (typeof Stripe !== 'undefined') {
+      console.log('Stripe loaded successfully');
+      initializePaymentMethods();
+    } else if (attempts < maxAttempts) {
+      setTimeout(checkStripe, 100);
+    } else {
+      console.error('Stripe failed to load');
+      showError('Payment system failed to load. Please refresh the page.');
+    }
+  }
+
+  checkStripe();
+}
+
+function loadOrderData() {
+  try {
+    // Load cart items from localStorage
+    var cartData = localStorage.getItem('giftballoon_cart');
+    if (cartData) {
+      var storedCart = JSON.parse(cartData);
+      cart = storedCart.map(function(item) {
+        return {
+          id: item.id || item.productId,
+          name: item.name,
+          price: item.price || 0,
+          quantity: item.quantity || 1,
+          image: item.image,
+          customization: item.customization || {}
+        };
+      });
+    }
+
+    displayOrderSummary();
+    calculateTotal();
+    console.log('Order data loaded:', cart);
+  } catch (error) {
+    console.error('Error loading order data:', error);
+    showError('Error loading your cart. Please try again.');
+  }
+}
+
+function displayOrderSummary() {
+  var summaryContainer = document.getElementById('orderSummary');
+
+  if (!cart || cart.length === 0) {
+    summaryContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-500 mb-4">No items in your cart</p><a href="./shop-production/" class="text-primary-600 hover:text-primary-700 font-semibold">← Continue Shopping</a></div>';
+    return;
+  }
+
+  var itemsHTML = '';
+  for (var i = 0; i < cart.length; i++) {
+    var item = cart[i];
+    itemsHTML += '<div class="flex items-center justify-between p-3 bg-white rounded-lg border">';
+    itemsHTML += '<div class="flex items-center space-x-3">';
+    itemsHTML += '<img src="' + (item.image || './images/placeholder.png') + '" alt="' + item.name + '" class="w-12 h-12 object-contain rounded" onerror="this.src=\'./images/placeholder.png\'" />';
+    itemsHTML += '<div>';
+    itemsHTML += '<h4 class="font-semibold text-gray-900">' + item.name + '</h4>';
+    itemsHTML += '<p class="text-sm text-gray-600">Qty: ' + item.quantity + '</p>';
+    if (item.customization && item.customization.customName) {
+      itemsHTML += '<p class="text-sm text-gray-600">Custom: ' + item.customization.customName + '</p>';
+    }
+    itemsHTML += '</div></div>';
+    itemsHTML += '<span class="font-bold text-primary-600">£' + (item.price * item.quantity).toFixed(2) + '</span>';
+    itemsHTML += '</div>';
+  }
+  summaryContainer.innerHTML = itemsHTML;
+}
+
+function calculateTotal() {
+  var subtotal = 0;
+  for (var i = 0; i < cart.length; i++) {
+    subtotal += cart[i].price * cart[i].quantity;
+  }
+
+  var deliveryFee = subtotal >= 50 ? 0 : 5.99;
+  currentTotal = subtotal + deliveryFee;
+
+  document.getElementById('grandTotal').textContent = '£' + currentTotal.toFixed(2);
+  console.log('Total calculated:', currentTotal);
+}
+
+function initializePaymentMethods() {
+  if (cart.length === 0 || isInitialized) {
+    return;
+  }
+
+  try {
+    console.log('Initializing payment methods...');
+
+    // Initialize Stripe
+    stripeGlobal = Stripe('pk_live_51SKpFv3aMX7zUeKo8mV5qhPkf5J0BNO2n3clWZHrghRZYfs2DVibiKAObQpPhDckSM2EwjvZBZIY4keWr4z0lMI700lEg3qheC');
+
+    // Initialize Stripe Elements
+    elementsGlobal = stripeGlobal.elements({
+      mode: 'payment',
+      amount: Math.round(currentTotal * 100), // Convert to pence
+      currency: 'gbp',
+      appearance: {
+        theme: 'stripe',
+        variables: {
+          colorPrimary: '#ff6b9d',
+          colorBackground: '#ffffff',
+          colorText: '#374151',
+          fontFamily: 'system-ui, sans-serif',
+          borderRadius: '8px',
+          colorDanger: '#df1b41',
+          spacingUnit: '6px',
+        }
+      }
+    });
+
+    // Create and mount payment element
+    paymentElementGlobal = elementsGlobal.create('payment', {
+      fields: {
+        billingDetails: {
+          name: 'auto',
+          email: 'auto',
+          phone: 'auto',
+          address: 'auto'
+        }
+      }
+    });
+    paymentElementGlobal.mount('#payment-element');
+
+    // Create express checkout element
+    try {
+      expressCheckoutElementGlobal = elementsGlobal.create('expressCheckout', {
+        buttonType: {
+          applePay: 'buy',
+          googlePay: 'buy'
+        },
+        buttonTheme: {
+          applePay: 'black',
+          googlePay: 'black'
+        },
+        buttonHeight: 48
+      });
+      expressCheckoutElementGlobal.mount('#express-checkout-element');
+
+      // Handle express checkout events
+      expressCheckoutElementGlobal.on('click', function(event) {
+        var customerData = getCustomerData();
+        if (!validateCustomerData(customerData)) {
+          event.preventDefault();
+          showError('Please fill in all required customer information first.');
+          return;
+        }
+        saveOrderRecord(customerData, 'express_checkout');
+      });
+
+    } catch (expressError) {
+      console.log('Express checkout not available:', expressError);
+      document.getElementById('express-checkout-section').style.display = 'none';
+    }
+
+    // Initialize PayPal
+    if (typeof paypal !== 'undefined') {
+      paypal.Buttons({
+        createOrder: function(data, actions) {
+          var customerData = getCustomerData();
+          if (!validateCustomerData(customerData)) {
+            showError('Please fill in all required customer information first.');
+            return Promise.reject(new Error('Customer data invalid'));
+          }
+
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                value: currentTotal.toFixed(2),
+                currency_code: 'GBP'
+              },
+              description: 'Gifted Balloon Order'
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            var customerData = getCustomerData();
+            saveOrderRecord(customerData, 'paypal', data.orderID);
+            showSuccess('Payment successful! Redirecting to confirmation page...');
+            setTimeout(function() {
+              window.location.href = './order-confirmation-production/?payment_method=paypal&order_id=' + data.orderID;
+            }, 2000);
+          });
+        },
+        onError: function(err) {
+          console.error('PayPal error:', err);
+          showError('PayPal payment failed. Please try again.');
+        }
+      }).render('#paypal-button-container');
+    }
+
+    // Handle payment element events
+    paymentElementGlobal.on('ready', function() {
+      console.log('Payment element is ready');
+    });
+
+    paymentElementGlobal.on('change', function(event) {
+      if (event.error) {
+        showError(event.error.message);
+      } else {
+        hideError();
+      }
+    });
+
+    isInitialized = true;
+    console.log('Payment methods initialized successfully');
+
+  } catch (error) {
+    console.error('Error initializing payment methods:', error);
+    showError('Payment system initialization failed. Please refresh the page.');
+  }
+}
+
+function getCustomerData() {
+  return {
+    name: (document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value).trim(),
+    firstName: document.getElementById('firstName').value,
+    lastName: document.getElementById('lastName').value,
+    email: document.getElementById('email').value,
+    phone: document.getElementById('phone').value,
+    address: document.getElementById('address').value,
+    city: document.getElementById('city').value,
+    county: document.getElementById('county').value,
+    postcode: document.getElementById('postcode').value,
+    deliveryNotes: document.getElementById('deliveryNotes').value
+  };
+}
+
+function validateCustomerData(data) {
+  return data.firstName && data.lastName && data.email && data.phone &&
+         data.address && data.city && data.postcode;
+}
+
+function handlePaymentSubmit() {
+  if (!stripeGlobal || !elementsGlobal) {
+    showError('Payment system not initialized. Please refresh and try again.');
+    return;
+  }
+
+  var customerData = getCustomerData();
+  if (!validateCustomerData(customerData)) {
+    showError('Please fill in all required fields.');
+    return;
+  }
+
+  // Show loading state
+  var submitButton = document.getElementById('submit-payment');
+  var originalText = submitButton.textContent;
+  submitButton.textContent = 'Processing Payment...';
+  submitButton.disabled = true;
+
+  // Save order before payment
+  var orderId = saveOrderRecord(customerData, 'stripe_card');
+
+  // Confirm payment with Stripe
+  stripeGlobal.confirmPayment({
+    elements: elementsGlobal,
+    confirmParams: {
+      return_url: window.location.origin + './order-confirmation-production/?order_id=' + orderId,
+      payment_method_data: {
+        billing_details: {
+          name: customerData.name,
+          email: customerData.email,
+          phone: customerData.phone,
+          address: {
+            line1: customerData.address,
+            city: customerData.city,
+            postal_code: customerData.postcode,
+            country: 'GB'
+          }
+        }
+      }
+    }
+  }).then(function(result) {
+    if (result.error) {
+      console.error('Payment failed:', result.error);
+      showError(result.error.message || 'Payment failed. Please try again.');
+    }
+    // If successful, user will be redirected
+  }).catch(function(error) {
+    console.error('Payment error:', error);
+    showError('Something went wrong. Please try again.');
+  }).finally(function() {
+    // Reset button state
+    submitButton.textContent = originalText;
+    submitButton.disabled = false;
+  });
+}
+
+function saveOrderRecord(customerData, paymentMethod, paymentId) {
+  var orderId = 'GB-' + Date.now();
+  var orderData = {
+    id: orderId,
+    customer_name: customerData.name,
+    customer_email: customerData.email,
+    customer_phone: customerData.phone,
+    delivery_address: {
+      line1: customerData.address,
+      city: customerData.city,
+      county: customerData.county,
+      postal_code: customerData.postcode,
+      country: 'GB'
+    },
+    delivery_notes: customerData.deliveryNotes,
+    items: cart,
+    subtotal: cart.reduce(function(sum, item) { return sum + (item.price * item.quantity); }, 0),
+    delivery_fee: currentTotal >= 50 ? 0 : 5.99,
+    total_amount: currentTotal,
+    payment_method: paymentMethod,
+    payment_id: paymentId || null,
+    payment_status: 'pending',
+    order_status: 'pending',
+    created_at: new Date().toISOString()
+  };
+
+  try {
+    // Save to localStorage as backup
+    localStorage.setItem('order_' + orderId, JSON.stringify(orderData));
+
+    // Send order via email (using Formspree or similar service)
+    fetch('https://formspree.io/f/xwpzgkaj', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        _subject: 'New Balloon Order - ' + orderId,
+        order_id: orderId,
+        customer_name: customerData.name,
+        customer_email: customerData.email,
+        customer_phone: customerData.phone,
+        delivery_address: JSON.stringify(orderData.delivery_address),
+        items: JSON.stringify(cart),
+        total_amount: currentTotal,
+        payment_method: paymentMethod,
+        created_at: orderData.created_at
+      })
+    }).catch(function(error) {
+      console.warn('Email notification failed:', error);
+      // Continue anyway - order is saved locally
+    });
+
+    console.log('Order saved:', orderId);
+    return orderId;
+
+  } catch (error) {
+    console.error('Error saving order:', error);
+    // Still return ID so payment can proceed
+    return orderId;
+  }
+}
+
+function showError(message) {
+  var errorDiv = document.getElementById('error-message');
+  errorDiv.textContent = message;
+  errorDiv.classList.remove('hidden');
+
+  setTimeout(function() {
+    errorDiv.classList.add('hidden');
+  }, 5000);
+}
+
+function hideError() {
+  var errorDiv = document.getElementById('error-message');
+  errorDiv.classList.add('hidden');
+}
+
+function showSuccess(message) {
+  var successDiv = document.getElementById('success-message');
+  successDiv.textContent = message;
+  successDiv.classList.remove('hidden');
+}
+
+// Initialize when script loads
+initializeCheckout();
+</script>
+</BaseLayout>

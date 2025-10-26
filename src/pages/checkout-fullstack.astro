@@ -1,0 +1,527 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const checkoutSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Secure Checkout - Gifted Balloon",
+  "description": "Complete your personalised balloon order with secure payment",
+  "url": "https://giftedballoon.com/checkout"
+};
+---
+
+<BaseLayout
+  title="Secure Checkout | Complete Your Order | Gifted Balloon"
+  description="Complete your personalised balloon order with secure payment. Apple Pay, Google Pay, and all major cards accepted."
+  ogImage="/images/5_Love_bouquet_30.png"
+  schema={checkoutSchema}
+  keywords="secure checkout, balloon order, payment, stripe, paypal, apple pay, google pay"
+>
+  <!-- External Scripts -->
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <main id="main-content">
+    <!-- Checkout Header -->
+    <section class="py-8 bg-gradient-to-br from-primary-50 to-purple-50">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 text-center">
+          🛒 Secure Checkout
+        </h1>
+        <p class="text-gray-600 text-center mt-2">Complete your personalised balloon order</p>
+      </div>
+    </section>
+
+    <!-- Checkout Content -->
+    <section class="py-12 bg-gray-50 min-h-screen">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-12">
+
+          <!-- Order Summary -->
+          <div class="bg-white rounded-2xl p-8 shadow-lg h-fit">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
+
+            <div id="orderSummary">
+              <!-- Order items will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Checkout Form -->
+          <div class="bg-white rounded-2xl p-8 shadow-lg">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Delivery & Payment</h2>
+
+            <form id="checkoutForm" class="space-y-6">
+              <!-- Customer Information -->
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label for="customerName" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="customerName"
+                    name="customerName"
+                    required
+                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                    placeholder="Your full name"
+                  />
+                </div>
+
+                <div>
+                  <label for="customerEmail" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    id="customerEmail"
+                    name="customerEmail"
+                    required
+                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                    placeholder="your@email.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label for="customerPhone" class="block text-sm font-semibold text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="customerPhone"
+                  name="customerPhone"
+                  class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                  placeholder="+44 7xxx xxx xxx"
+                />
+              </div>
+
+              <!-- Delivery Address -->
+              <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Delivery Address</h3>
+
+                <div class="space-y-4">
+                  <div>
+                    <label for="addressLine1" class="block text-sm font-semibold text-gray-700 mb-2">
+                      Address Line 1 *
+                    </label>
+                    <input
+                      type="text"
+                      id="addressLine1"
+                      name="addressLine1"
+                      required
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                      placeholder="House number and street name"
+                    />
+                  </div>
+
+                  <div>
+                    <label for="addressLine2" class="block text-sm font-semibold text-gray-700 mb-2">
+                      Address Line 2
+                    </label>
+                    <input
+                      type="text"
+                      id="addressLine2"
+                      name="addressLine2"
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                      placeholder="Apartment, suite, unit, etc."
+                    />
+                  </div>
+
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label for="city" class="block text-sm font-semibold text-gray-700 mb-2">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        required
+                        class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                        placeholder="City"
+                      />
+                    </div>
+
+                    <div>
+                      <label for="postalCode" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Postal Code *
+                      </label>
+                      <input
+                        type="text"
+                        id="postalCode"
+                        name="postalCode"
+                        required
+                        class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                        placeholder="SW1A 1AA"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="country" class="block text-sm font-semibold text-gray-700 mb-2">
+                      Country *
+                    </label>
+                    <select
+                      id="country"
+                      name="country"
+                      required
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                    >
+                      <option value="GB">United Kingdom</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Delivery Instructions -->
+              <div>
+                <label for="deliveryInstructions" class="block text-sm font-semibold text-gray-700 mb-2">
+                  Delivery Instructions (Optional)
+                </label>
+                <textarea
+                  id="deliveryInstructions"
+                  name="deliveryInstructions"
+                  rows="3"
+                  class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                  placeholder="Special delivery instructions..."
+                ></textarea>
+              </div>
+
+              <!-- Payment Section -->
+              <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Information</h3>
+
+                <!-- Stripe Elements will be mounted here -->
+                <div id="payment-element" class="mb-4">
+                  <!-- Stripe Elements will create form elements here -->
+                </div>
+
+                <!-- Payment Error Display -->
+                <div id="payment-errors" class="hidden text-red-600 text-sm mb-4"></div>
+
+                <!-- Order Total -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                  <div class="flex justify-between items-center">
+                    <span class="text-lg font-semibold">Total:</span>
+                    <span id="orderTotal" class="text-2xl font-bold text-primary-600">£0.00</span>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button
+                  type="submit"
+                  id="submitPayment"
+                  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-4 rounded-lg font-bold text-lg transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span id="submitText">Complete Order</span>
+                  <span id="loadingSpinner" class="hidden">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </span>
+                </button>
+
+                <!-- Security Notice -->
+                <div class="mt-4 text-center text-sm text-gray-600">
+                  <p>🔒 Your payment information is secure and encrypted</p>
+                  <p>Powered by Stripe • SSL Protected</p>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<script is:inline>
+// Global variables
+let stripe = null;
+let elements = null;
+let paymentElement = null;
+let cart = [];
+let sessionId = '';
+
+// Get session ID
+function getSessionId() {
+  return localStorage.getItem('giftballoon_session') || '';
+}
+
+// Initialize Stripe and load cart
+function initializeCheckout() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupCheckout);
+  } else {
+    setupCheckout();
+  }
+}
+
+async function setupCheckout() {
+  console.log('Checkout initializing...');
+
+  sessionId = getSessionId();
+  if (!sessionId) {
+    alert('No active session found. Please return to the shop.');
+    window.location.href = '/shop-fullstack';
+    return;
+  }
+
+  await initializeStripe();
+  await loadCart();
+  setupEventListeners();
+
+  console.log('Checkout initialized successfully');
+}
+
+// Initialize Stripe
+async function initializeStripe() {
+  const stripeKey = 'pk_live_51SKpFv3aMX7zUeKo8mV5qhPkf5J0BNO2n3clWZHrghRZYfs2DVibiKAObQpPhDckSM2EwjvZBZIY4keWr4z0lMI700lEg3qheC';
+
+  if (typeof Stripe === 'undefined') {
+    console.error('Stripe library not loaded');
+    return;
+  }
+
+  stripe = Stripe(stripeKey);
+
+  // Create elements instance
+  const appearance = {
+    theme: 'stripe',
+    variables: {
+      colorPrimary: '#ff6b9d',
+    }
+  };
+
+  elements = stripe.elements({ appearance });
+
+  // Create payment element
+  paymentElement = elements.create('payment');
+  paymentElement.mount('#payment-element');
+}
+
+// Load cart from database
+async function loadCart() {
+  try {
+    const response = await fetch('/api/cart', {
+      headers: {
+        'X-Session-ID': sessionId
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      cart = data.items || [];
+      displayOrderSummary();
+    } else {
+      throw new Error('Failed to load cart');
+    }
+  } catch (error) {
+    console.error('Error loading cart:', error);
+    loadCartFromLocalStorage();
+  }
+}
+
+// Fallback cart loading
+function loadCartFromLocalStorage() {
+  try {
+    const cartData = localStorage.getItem('giftballoon_cart');
+    if (cartData) {
+      cart = JSON.parse(cartData);
+      displayOrderSummary();
+    } else {
+      displayEmptyCart();
+    }
+  } catch (error) {
+    console.error('Error loading cart from localStorage:', error);
+    displayEmptyCart();
+  }
+}
+
+// Display order summary
+function displayOrderSummary() {
+  const summaryContainer = document.getElementById('orderSummary');
+  const totalElement = document.getElementById('orderTotal');
+
+  if (!cart || cart.length === 0) {
+    displayEmptyCart();
+    return;
+  }
+
+  let itemsHTML = '<div class="space-y-4 mb-6">';
+  let total = 0;
+
+  cart.forEach(item => {
+    const itemTotal = item.price * item.quantity;
+    total += itemTotal;
+
+    itemsHTML += `
+      <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+        <div class="flex items-center space-x-4">
+          <img
+            src="${item.image_url || '/images/placeholder.png'}"
+            alt="${item.name}"
+            class="w-16 h-16 object-contain rounded-lg"
+            onerror="this.src='/images/placeholder.png'"
+          />
+          <div>
+            <h4 class="font-semibold text-gray-900">${item.name}</h4>
+            <p class="text-sm text-gray-600">Quantity: ${item.quantity}</p>
+            ${item.customization?.customName ? `<p class="text-sm text-gray-600">Custom: "${item.customization.customName}"</p>` : ''}
+            ${item.customization?.occasionType ? `<p class="text-sm text-gray-600">Occasion: ${item.customization.occasionType}</p>` : ''}
+          </div>
+        </div>
+        <span class="font-bold text-primary-600">£${itemTotal.toFixed(2)}</span>
+      </div>
+    `;
+  });
+
+  itemsHTML += '</div>';
+
+  // Add total
+  itemsHTML += `
+    <div class="border-t border-gray-200 pt-4">
+      <div class="flex justify-between items-center text-lg font-bold">
+        <span>Total:</span>
+        <span class="text-primary-600">£${total.toFixed(2)}</span>
+      </div>
+    </div>
+  `;
+
+  summaryContainer.innerHTML = itemsHTML;
+  totalElement.textContent = `£${total.toFixed(2)}`;
+}
+
+// Display empty cart message
+function displayEmptyCart() {
+  const summaryContainer = document.getElementById('orderSummary');
+  summaryContainer.innerHTML = `
+    <div class="text-center py-8">
+      <p class="text-gray-500 mb-4">Your cart is empty</p>
+      <a href="/shop-fullstack" class="text-primary-600 hover:text-primary-700 font-semibold">
+        ← Continue Shopping
+      </a>
+    </div>
+  `;
+}
+
+// Setup event listeners
+function setupEventListeners() {
+  const form = document.getElementById('checkoutForm');
+  form.addEventListener('submit', handleSubmit);
+}
+
+// Handle form submission
+async function handleSubmit(event) {
+  event.preventDefault();
+
+  if (!stripe || !elements) {
+    console.error('Stripe not initialized');
+    return;
+  }
+
+  setLoadingState(true);
+
+  try {
+    // Get form data
+    const formData = new FormData(event.target);
+    const customerData = {
+      name: formData.get('customerName'),
+      email: formData.get('customerEmail'),
+      phone: formData.get('customerPhone')
+    };
+
+    const deliveryData = {
+      address: {
+        line1: formData.get('addressLine1'),
+        line2: formData.get('addressLine2'),
+        city: formData.get('city'),
+        postal_code: formData.get('postalCode'),
+        country: formData.get('country')
+      },
+      instructions: formData.get('deliveryInstructions')
+    };
+
+    // Calculate total
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalInPence = Math.round(total * 100);
+
+    // Create payment intent
+    const response = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: totalInPence,
+        currency: 'gbp',
+        order_details: {
+          customer: customerData,
+          delivery: deliveryData,
+          cart: cart.map(item => ({
+            product_id: item.product_id,
+            quantity: item.quantity,
+            price: item.price,
+            customization: item.customization
+          }))
+        }
+      })
+    });
+
+    const { client_secret, order_id, error } = await response.json();
+
+    if (error) {
+      throw new Error(error);
+    }
+
+    // Confirm payment
+    const { error: stripeError } = await stripe.confirmPayment({
+      elements,
+      clientSecret: client_secret,
+      confirmParams: {
+        return_url: `${window.location.origin}/order-confirmation-fullstack?order_id=${order_id}`,
+      },
+    });
+
+    if (stripeError) {
+      showPaymentError(stripeError.message);
+      setLoadingState(false);
+    }
+    // If no error, user will be redirected to success page
+
+  } catch (error) {
+    console.error('Payment failed:', error);
+    showPaymentError(error.message || 'Payment failed. Please try again.');
+    setLoadingState(false);
+  }
+}
+
+// Show payment error
+function showPaymentError(message) {
+  const errorElement = document.getElementById('payment-errors');
+  errorElement.textContent = message;
+  errorElement.classList.remove('hidden');
+}
+
+// Set loading state
+function setLoadingState(isLoading) {
+  const submitButton = document.getElementById('submitPayment');
+  const submitText = document.getElementById('submitText');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+
+  if (isLoading) {
+    submitButton.disabled = true;
+    submitText.classList.add('hidden');
+    loadingSpinner.classList.remove('hidden');
+  } else {
+    submitButton.disabled = false;
+    submitText.classList.remove('hidden');
+    loadingSpinner.classList.add('hidden');
+  }
+}
+
+// Initialize checkout
+initializeCheckout();
+</script>
+</BaseLayout>

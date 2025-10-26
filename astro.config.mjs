@@ -6,8 +6,7 @@ import vercel from '@astrojs/vercel/serverless';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://giftedballoon.com',
-  output: 'hybrid',
-  adapter: vercel(),
+  output: 'static',
   integrations: [
     sitemap({
       changefreq: 'weekly',
@@ -36,21 +35,20 @@ export default defineConfig({
   compressHTML: true,
   build: {
     inlineStylesheets: 'auto',
-    assets: '_astro'
+    assets: 'assets',
+    format: 'directory'
   },
   vite: {
     build: {
       cssCodeSplit: false,
+      minify: 'esbuild',
       rollupOptions: {
         output: {
-          assetFileNames: '[name].[hash][extname]',
-          chunkFileNames: '[name].[hash].js',
-          entryFileNames: '[name].[hash].js'
+          assetFileNames: 'assets/[name].[hash][extname]',
+          chunkFileNames: 'assets/[name].[hash].js',
+          entryFileNames: 'assets/[name].[hash].js'
         }
       }
-    },
-    ssr: {
-      noExternal: []
     }
   },
   image: {

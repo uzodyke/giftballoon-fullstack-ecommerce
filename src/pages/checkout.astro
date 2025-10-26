@@ -3,6 +3,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import { stripeConfig } from '@/config/stripe';
 
+export const prerender = true;
+
 const breadcrumbItems = [
   { label: 'Home', href: '/' },
   { label: 'Shop', href: '/shop' },
@@ -17,8 +19,6 @@ const checkoutSchema = {
   "description": "Complete your personalised balloon order with secure payment",
   "url": "https://giftedballoon.com/checkout"
 };
-
-export const prerender = false;
 ---
 
 <BaseLayout
@@ -294,19 +294,21 @@ export const prerender = false;
 
               <!-- Payment Details -->
               <div id="paymentDetails" class="space-y-6">
-                <!-- Stripe Elements will be mounted here -->
-                <div id="card-element" class="p-4 border-2 border-gray-200 rounded-lg bg-gray-50">
-                  <!-- Card element placeholder -->
+                <!-- Card Payment Container -->
+                <div id="card-element" class="p-4 border-2 border-gray-200 rounded-lg bg-white">
+                  <div id="payment-element">
+                    <!-- Stripe payment element will be mounted here -->
+                  </div>
                 </div>
 
                 <!-- PayPal Container -->
-                <div id="paypal-button-container" class="hidden"></div>
+                <div id="paypal-button-container" class="hidden p-4 border-2 border-gray-200 rounded-lg"></div>
 
                 <!-- Express Checkout Container -->
-                <div id="express-checkout-element" class="hidden"></div>
+                <div id="express-checkout-element" class="hidden p-4 border-2 border-gray-200 rounded-lg"></div>
 
                 <!-- Payment Errors -->
-                <div id="payment-errors" class="text-red-600 text-sm hidden"></div>
+                <div id="payment-errors" class="text-red-600 text-sm hidden p-3 bg-red-50 rounded-lg border border-red-200"></div>
               </div>
 
               <!-- Terms and Complete Order -->
@@ -394,6 +396,9 @@ export const prerender = false;
 <!-- Load Stripe.js -->
 <script src="https://js.stripe.com/v3/"></script>
 
+<!-- Load cart store -->
+<script src="/src/lib/cart-store.ts" type="module"></script>
+
 <!-- Load PayPal SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=Acgd4Q8DkEhEwPaWWg6Q4QwPSBLvXgJ3o4RXcFz7HrBKWq3IfO0r4DdJGF9Y6Og6Lv2HJI4Bs_-dFGHk&currency=GBP&components=buttons,payment-fields"></script>
 
@@ -428,10 +433,18 @@ export const prerender = false;
       currentOrder = JSON.parse(orderData);
       cart = [currentOrder];
     } else {
-      // Load cart items
-      const cartData = localStorage.getItem('cart');
+      // Load cart items from our cart store
+      const cartData = localStorage.getItem('giftballoon_cart');
       if (cartData) {
-        cart = JSON.parse(cartData);
+        const storedCart = JSON.parse(cartData);
+        cart = storedCart.map(item => ({
+          id: item.productId || item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image,
+          customization: item.customization || {}
+        }));
       }
     }
 
@@ -493,28 +506,13 @@ export const prerender = false;
 
   async function initializeStripeElements() {
     try {
-      // Create payment intent
-      const response = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: Math.round(currentTotal * 100), // Convert to pence
-          currency: 'gbp',
-          order_details: {
-            cart: cart,
-            customer: {},
-            delivery: {}
-          }
-        }),
-      });
+      console.log('Initializing client-side Stripe Elements...');
 
-      const { client_secret } = await response.json();
-
-      // Create elements instance
+      // Client-side only approach - create elements without server payment intent
       elements = stripe.elements({
-        clientSecret: client_secret,
+        mode: 'payment',
+        amount: Math.round(currentTotal * 100), // Convert to pence
+        currency: 'gbp',
         appearance: {
           theme: 'stripe',
           variables: {
@@ -522,27 +520,114 @@ export const prerender = false;
             colorBackground: '#ffffff',
             colorText: '#374151',
             fontFamily: 'system-ui, sans-serif',
+            borderRadius: '8px',
+            colorDanger: '#df1b41',
+            spacingUnit: '6px',
+          },
+          rules: {
+            '.Input': {
+              border: '2px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '12px',
+              fontSize: '16px'
+            },
+            '.Input:focus': {
+              border: '2px solid #ff6b9d',
+              boxShadow: '0 0 0 2px rgba(255, 107, 157, 0.2)'
+            }
           }
         }
       });
 
-      // Create and mount payment element
-      paymentElement = elements.create('payment');
-      paymentElement.mount('#card-element');
-
-      // Create express checkout element
-      expressCheckoutElement = elements.create('expressCheckout', {
-        buttonType: {
-          applePay: 'buy',
-          googlePay: 'buy'
+      // Create and mount payment element with all payment methods enabled
+      paymentElement = elements.create('payment', {
+        layout: 'tabs',
+        defaultValues: {
+          billingDetails: {
+            name: '',
+            email: '',
+            phone: '',
+            address: {
+              country: 'GB'
+            }
+          }
+        },
+        fields: {
+          billingDetails: {
+            name: 'auto',
+            email: 'auto',
+            phone: 'auto',
+            address: {
+              line1: 'auto',
+              line2: 'auto',
+              city: 'auto',
+              state: 'auto',
+              postalCode: 'auto',
+              country: 'auto'
+            }
+          }
+        },
+        wallets: {
+          applePay: 'auto',
+          googlePay: 'auto'
         }
       });
-      expressCheckoutElement.mount('#express-checkout-element');
+
+      paymentElement.mount('#payment-element');
+      console.log('Payment element mounted successfully');
+
+      // Create express checkout element for quick payments
+      try {
+        expressCheckoutElement = elements.create('expressCheckout', {
+          buttonType: {
+            applePay: 'buy',
+            googlePay: 'buy'
+          },
+          buttonTheme: {
+            applePay: 'black',
+            googlePay: 'black'
+          },
+          buttonHeight: 48,
+          paymentMethods: {
+            applePay: 'auto',
+            googlePay: 'auto',
+            link: 'auto'
+          }
+        });
+
+        expressCheckoutElement.mount('#express-checkout-element');
+        console.log('Express checkout element mounted successfully');
+
+        // Show express checkout by default if available
+        document.getElementById('express-checkout-element').classList.remove('hidden');
+      } catch (expressError) {
+        console.log('Express checkout not available:', expressError);
+        // Hide express checkout option if not available
+        const expressOption = document.querySelector('input[value="express"]');
+        if (expressOption) {
+          expressOption.closest('div').style.display = 'none';
+        }
+      }
+
+      // Handle payment element events
+      paymentElement.on('ready', () => {
+        console.log('Payment element is ready');
+        // Make sure card element is visible by default
+        document.getElementById('card-element').classList.remove('hidden');
+      });
+
+      paymentElement.on('change', (event) => {
+        if (event.error) {
+          showPaymentError(event.error.message);
+        } else {
+          // Clear any existing errors
+          document.getElementById('payment-errors').classList.add('hidden');
+        }
+      });
 
     } catch (error) {
       console.error('Error initializing Stripe:', error);
-      document.getElementById('payment-errors').textContent = 'Payment system unavailable. Please try again later.';
-      document.getElementById('payment-errors').classList.remove('hidden');
+      showPaymentError('Payment system unavailable. Please check your internet connection and try again.');
     }
   }
 
@@ -610,14 +695,101 @@ export const prerender = false;
     });
   }
 
+  function getCustomerData() {
+    const firstName = document.getElementById('firstName')?.value || '';
+    const lastName = document.getElementById('lastName')?.value || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    return {
+      name: fullName,
+      email: document.getElementById('email')?.value || '',
+      phone: document.getElementById('phone')?.value || '',
+      address: {
+        line1: document.getElementById('address')?.value || '',
+        line2: '',
+        city: document.getElementById('city')?.value || '',
+        postal_code: document.getElementById('postcode')?.value || '',
+        country: 'GB'
+      }
+    };
+  }
+
   async function handleFormSubmit(event) {
     event.preventDefault();
 
-    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    if (!stripe || !elements) {
+      showPaymentError('Payment system not initialized. Please refresh and try again.');
+      return;
+    }
 
-    if (selectedPaymentMethod === 'card') {
-      await handleStripePayment();
-    } else if (selectedPaymentMethod === 'paypal') {
+    // Show loading state
+    const submitButton = document.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Processing...';
+    submitButton.disabled = true;
+
+    try {
+      // Get customer information
+      const customerData = getCustomerData();
+
+      // Create order in Supabase first (client-side)
+      const orderData = {
+        customer_name: customerData.name,
+        customer_email: customerData.email,
+        customer_phone: customerData.phone,
+        delivery_address: customerData.address,
+        items: cart,
+        total_amount: currentTotal,
+        payment_status: 'pending',
+        status: 'pending',
+        created_at: new Date().toISOString()
+      };
+
+      // Store order locally for now (Supabase integration will be handled later)
+      const orderId = 'GB-' + Date.now();
+      localStorage.setItem('currentOrderData', JSON.stringify({ ...orderData, id: orderId }));
+
+      // Submit payment with Stripe
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/order-confirmation?order_id=${orderId}`,
+          payment_method_data: {
+            billing_details: {
+              name: customerData.name,
+              email: customerData.email,
+              phone: customerData.phone,
+              address: {
+                line1: customerData.address.line1,
+                line2: customerData.address.line2,
+                city: customerData.address.city,
+                postal_code: customerData.address.postal_code,
+                country: customerData.address.country,
+              }
+            }
+          }
+        }
+      });
+
+      if (error) {
+        // Payment failed
+        console.error('Payment failed:', error);
+        showPaymentError(error.message || 'Payment failed. Please try again.');
+      }
+      // If successful, user will be redirected to return_url
+
+    } catch (err) {
+      console.error('Form submission error:', err);
+      showPaymentError('Something went wrong. Please try again.');
+    } finally {
+      // Reset button state
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+    }
+
+    // Legacy code for other payment methods (kept for compatibility)
+    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    if (selectedPaymentMethod === 'paypal') {
       // PayPal handles its own submission
       showPaymentError('Please use the PayPal button to complete your payment.');
     } else if (selectedPaymentMethod === 'express') {

@@ -1,0 +1,252 @@
+---
+export interface Props {
+  src: string;
+  alt: string;
+  product?: {
+    name: string;
+    price: number;
+    description?: string;
+  };
+}
+
+const { src, alt, product } = Astro.props;
+---
+
+<div id="zoom-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden items-center justify-center p-4">
+  <div class="relative max-w-7xl max-h-screen w-full h-full flex items-center justify-center">
+    <!-- Close Button -->
+    <button
+      id="zoom-close"
+      class="absolute top-4 right-4 z-60 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full transition-colors backdrop-blur-sm"
+      aria-label="Close zoom view"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Product Info Overlay -->
+    {product && (
+      <div class="absolute top-4 left-4 z-60 bg-white bg-opacity-95 backdrop-blur-sm rounded-xl p-6 max-w-md shadow-2xl">
+        <h3 class="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
+        {product.description && (
+          <p class="text-gray-600 text-sm mb-3">{product.description}</p>
+        )}
+        <div class="text-primary-600 font-bold text-lg">£{product.price.toFixed(2)}</div>
+      </div>
+    )}
+
+    <!-- Zoom Controls -->
+    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-60 flex gap-2">
+      <button
+        id="zoom-out"
+        class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full transition-colors backdrop-blur-sm"
+        aria-label="Zoom out"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+        </svg>
+      </button>
+
+      <button
+        id="zoom-reset"
+        class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors backdrop-blur-sm"
+      >
+        Reset
+      </button>
+
+      <button
+        id="zoom-in"
+        class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full transition-colors backdrop-blur-sm"
+        aria-label="Zoom in"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Image Container -->
+    <div
+      id="zoom-container"
+      class="relative bg-white rounded-lg overflow-hidden shadow-2xl max-w-full max-h-full cursor-grab active:cursor-grabbing"
+      style="min-width: 300px; min-height: 300px;"
+    >
+      <img
+        id="zoom-image"
+        src={src}
+        alt={alt}
+        class="w-full h-full object-contain transition-transform duration-200 ease-out select-none"
+        style="transform-origin: center center;"
+        draggable="false"
+      />
+    </div>
+  </div>
+</div>
+
+<script>
+  class ZoomableImageViewer {
+    private modal: HTMLElement;
+    private image: HTMLImageElement;
+    private container: HTMLElement;
+    private scale = 1;
+    private isPanning = false;
+    private startX = 0;
+    private startY = 0;
+    private translateX = 0;
+    private translateY = 0;
+
+    constructor() {
+      this.modal = document.getElementById('zoom-modal') as HTMLElement;
+      this.image = document.getElementById('zoom-image') as HTMLImageElement;
+      this.container = document.getElementById('zoom-container') as HTMLElement;
+
+      this.initializeEventListeners();
+    }
+
+    private initializeEventListeners() {
+      // Close button
+      document.getElementById('zoom-close')?.addEventListener('click', () => this.close());
+
+      // Zoom controls
+      document.getElementById('zoom-in')?.addEventListener('click', () => this.zoomIn());
+      document.getElementById('zoom-out')?.addEventListener('click', () => this.zoomOut());
+      document.getElementById('zoom-reset')?.addEventListener('click', () => this.reset());
+
+      // Mouse events for panning
+      this.container.addEventListener('mousedown', this.startPan.bind(this));
+      this.container.addEventListener('mousemove', this.pan.bind(this));
+      this.container.addEventListener('mouseup', this.stopPan.bind(this));
+      this.container.addEventListener('mouseleave', this.stopPan.bind(this));
+
+      // Touch events for mobile
+      this.container.addEventListener('touchstart', this.handleTouchStart.bind(this));
+      this.container.addEventListener('touchmove', this.handleTouchMove.bind(this));
+      this.container.addEventListener('touchend', this.stopPan.bind(this));
+
+      // Wheel zoom
+      this.container.addEventListener('wheel', this.handleWheel.bind(this));
+
+      // Escape key to close
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') this.close();
+      });
+
+      // Click outside to close
+      this.modal.addEventListener('click', (e) => {
+        if (e.target === this.modal) this.close();
+      });
+    }
+
+    open(src: string, alt: string, productData?: any) {
+      this.image.src = src;
+      this.image.alt = alt;
+      this.reset();
+      this.modal.classList.remove('hidden');
+      this.modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    close() {
+      this.modal.classList.add('hidden');
+      this.modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    private zoomIn() {
+      this.scale = Math.min(this.scale * 1.2, 5);
+      this.updateTransform();
+    }
+
+    private zoomOut() {
+      this.scale = Math.max(this.scale / 1.2, 0.5);
+      this.updateTransform();
+    }
+
+    private reset() {
+      this.scale = 1;
+      this.translateX = 0;
+      this.translateY = 0;
+      this.updateTransform();
+    }
+
+    private startPan(e: MouseEvent) {
+      if (this.scale > 1) {
+        this.isPanning = true;
+        this.startX = e.clientX - this.translateX;
+        this.startY = e.clientY - this.translateY;
+        this.container.style.cursor = 'grabbing';
+      }
+    }
+
+    private pan(e: MouseEvent) {
+      if (this.isPanning && this.scale > 1) {
+        e.preventDefault();
+        this.translateX = e.clientX - this.startX;
+        this.translateY = e.clientY - this.startY;
+        this.updateTransform();
+      }
+    }
+
+    private stopPan() {
+      this.isPanning = false;
+      this.container.style.cursor = this.scale > 1 ? 'grab' : 'default';
+    }
+
+    private handleTouchStart(e: TouchEvent) {
+      if (e.touches.length === 1 && this.scale > 1) {
+        this.isPanning = true;
+        this.startX = e.touches[0].clientX - this.translateX;
+        this.startY = e.touches[0].clientY - this.translateY;
+      }
+    }
+
+    private handleTouchMove(e: TouchEvent) {
+      if (this.isPanning && e.touches.length === 1 && this.scale > 1) {
+        e.preventDefault();
+        this.translateX = e.touches[0].clientX - this.startX;
+        this.translateY = e.touches[0].clientY - this.startY;
+        this.updateTransform();
+      }
+    }
+
+    private handleWheel(e: WheelEvent) {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 1.1 : 0.9;
+      this.scale = Math.max(0.5, Math.min(5, this.scale * delta));
+      this.updateTransform();
+    }
+
+    private updateTransform() {
+      this.image.style.transform = `translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`;
+
+      // Update cursor based on zoom level
+      this.container.style.cursor = this.scale > 1 ? 'grab' : 'default';
+    }
+  }
+
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    window.zoomViewer = new ZoomableImageViewer();
+  });
+
+  // Global function to open zoom viewer
+  window.openZoomViewer = function(src: string, alt: string, productData?: any) {
+    if (window.zoomViewer) {
+      window.zoomViewer.open(src, alt, productData);
+    }
+  };
+</script>
+
+<style>
+  #zoom-container {
+    touch-action: none;
+  }
+
+  #zoom-image {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+</style>
