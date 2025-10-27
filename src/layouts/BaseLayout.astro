@@ -88,6 +88,83 @@ const criticalCSS = `
   <!-- Critical CSS Inline -->
   <style set:html={criticalCSS}></style>
 
+  <!-- Zoom Functionality - Immediate Loading -->
+  <script is:inline>
+    console.log('Loading immediate zoom functionality...');
+
+    // Simple zoom function - available immediately
+    function openZoomModal(button) {
+      console.log('Zoom triggered for:', button.dataset.productName);
+
+      try {
+        // Get modal (create if it doesn't exist)
+        let modal = document.getElementById('simple-zoom-modal');
+        if (!modal) {
+          console.log('Modal not found, will try again when DOM loads');
+          return;
+        }
+
+        // Update modal content
+        const nameEl = document.getElementById('zoom-product-name');
+        const descEl = document.getElementById('zoom-product-description');
+        const priceEl = document.getElementById('zoom-product-price');
+        const imageEl = document.getElementById('zoom-image');
+
+        if (nameEl) nameEl.textContent = button.dataset.productName || '';
+        if (descEl) descEl.textContent = button.dataset.productDescription || '';
+        if (priceEl) priceEl.textContent = button.dataset.productPrice || '';
+        if (imageEl) {
+          imageEl.src = button.dataset.productImage || '';
+          imageEl.alt = button.dataset.productName || '';
+        }
+
+        // Show modal
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+
+        console.log('Zoom modal opened successfully');
+      } catch (error) {
+        console.error('Zoom error:', error);
+      }
+    }
+
+    // Close modal function
+    function closeZoomModal() {
+      const modal = document.getElementById('simple-zoom-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Set up event delegation immediately
+    document.addEventListener('click', function(e) {
+      // Handle zoom triggers
+      if (e.target.classList.contains('zoom-trigger') || e.target.classList.contains('quick-view-btn')) {
+        e.preventDefault();
+        openZoomModal(e.target);
+        return;
+      }
+
+      // Handle close buttons
+      if (e.target.id === 'close-zoom' ||
+          e.target.closest('#close-zoom') ||
+          (e.target.id === 'simple-zoom-modal' && e.target === e.currentTarget)) {
+        closeZoomModal();
+        return;
+      }
+    });
+
+    // Make functions globally available for any remaining inline handlers
+    window.openImageZoom = openZoomModal;
+    window.openZoomModal = openZoomModal;
+    window.closeZoomModal = closeZoomModal;
+
+    console.log('Zoom functionality loaded and ready');
+  </script>
+
   <!-- Font Loading Strategy -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript>
