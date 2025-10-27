@@ -805,20 +805,31 @@ const breadcrumbItems = [
 <script>
   // Bridge function to connect ProductCard quick view with ZoomableImageViewer
   (window as any).openImageZoom = function(button: HTMLElement) {
-    const productName = button.dataset.productName;
-    const productImage = button.dataset.productImage;
-    const productDescription = button.dataset.productDescription;
-    const productPrice = parseFloat(button.dataset.productPrice || '0');
+    try {
+      console.log('openImageZoom called', button);
 
-    const productData = {
-      name: productName,
-      description: productDescription,
-      price: productPrice
-    };
+      const productName = button.dataset.productName;
+      const productImage = button.dataset.productImage;
+      const productDescription = button.dataset.productDescription;
+      const productPrice = parseFloat(button.dataset.productPrice || '0');
 
-    // Use the ZoomableImageViewer's open function
-    if ((window as any).openZoomViewer) {
-      (window as any).openZoomViewer(productImage, productName, productData);
+      console.log('Product data:', { productName, productImage, productDescription, productPrice });
+
+      const productData = {
+        name: productName,
+        description: productDescription,
+        price: productPrice
+      };
+
+      // Use the ZoomableImageViewer's open function
+      if ((window as any).openZoomViewer) {
+        console.log('Calling openZoomViewer');
+        (window as any).openZoomViewer(productImage, productName, productData);
+      } else {
+        console.error('openZoomViewer not found on window');
+      }
+    } catch (error) {
+      console.error('Error in openImageZoom:', error);
     }
   };
 </script>

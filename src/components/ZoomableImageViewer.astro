@@ -225,17 +225,24 @@ const { src, alt, product } = Astro.props;
     }
   }
 
-  // Initialize when DOM is loaded
-  document.addEventListener('DOMContentLoaded', () => {
-    (window as any).zoomViewer = new ZoomableImageViewer();
-  });
-
   // Global function to open zoom viewer
   (window as any).openZoomViewer = function(src: string, alt: string, productData?: any) {
+    // Ensure the viewer is initialized
+    if (!(window as any).zoomViewer) {
+      (window as any).zoomViewer = new ZoomableImageViewer();
+    }
+
     if ((window as any).zoomViewer) {
       (window as any).zoomViewer.open(src, alt, productData);
     }
   };
+
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!(window as any).zoomViewer) {
+      (window as any).zoomViewer = new ZoomableImageViewer();
+    }
+  });
 </script>
 
 <style>
