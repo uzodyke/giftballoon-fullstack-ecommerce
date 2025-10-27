@@ -411,46 +411,8 @@ const featuredProducts = [products[1], products[7]]; // Luxury and Golden Treasu
     const productDescription = button.dataset.productDescription;
     const productPrice = button.dataset.productPrice;
 
-    // Create modal if it doesn't exist
-    let modal = document.getElementById('simple-zoom-modal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'simple-zoom-modal';
-      modal.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 hidden items-center justify-center p-4';
-      modal.innerHTML = `
-        <div class="relative max-w-4xl max-h-screen w-full">
-          <button id="close-zoom" class="absolute top-4 right-4 z-60 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <div class="absolute top-4 left-4 z-60 bg-white bg-opacity-95 rounded-lg p-4 max-w-md">
-            <h3 id="zoom-product-name" class="text-xl font-bold text-gray-900 mb-2"></h3>
-            <p id="zoom-product-description" class="text-gray-600 text-sm mb-2"></p>
-            <div class="text-primary-600 font-bold text-lg">£<span id="zoom-product-price"></span></div>
-          </div>
-          <div class="bg-white rounded-lg p-4 max-h-[90vh] overflow-hidden flex items-center justify-center">
-            <img id="zoom-image" class="max-w-full max-h-full object-contain" />
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-
-      // Add close functionality
-      modal.querySelector('#close-zoom').addEventListener('click', () => {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        document.body.style.overflow = '';
-      });
-
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          modal.classList.add('hidden');
-          modal.classList.remove('flex');
-          document.body.style.overflow = '';
-        }
-      });
-    }
+    // Get the modal (it's now in the HTML)
+    const modal = document.getElementById('simple-zoom-modal');
 
     // Update modal content
     document.getElementById('zoom-product-name').textContent = productName;
@@ -467,6 +429,30 @@ const featuredProducts = [products[1], products[7]]; // Luxury and Golden Treasu
 
   // Make function globally available
   window.openImageZoom = openImageZoom;
+
+  // Set up close functionality when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('simple-zoom-modal');
+    const closeBtn = document.getElementById('close-zoom');
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
+      });
+    }
+
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          document.body.style.overflow = '';
+        }
+      });
+    }
+  });
 
 </script>
 
@@ -510,5 +496,21 @@ const featuredProducts = [products[1], products[7]]; // Luxury and Golden Treasu
 
 </style>
 
-<!-- Zoomable Image Viewer -->
-<ZoomableImageViewer src="" alt="" />
+<!-- Simple Zoom Modal -->
+<div id="simple-zoom-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden items-center justify-center p-4">
+  <div class="relative max-w-4xl max-h-screen w-full">
+    <button id="close-zoom" class="absolute top-4 right-4 z-60 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full">
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="absolute top-4 left-4 z-60 bg-white bg-opacity-95 rounded-lg p-4 max-w-md">
+      <h3 id="zoom-product-name" class="text-xl font-bold text-gray-900 mb-2"></h3>
+      <p id="zoom-product-description" class="text-gray-600 text-sm mb-2"></p>
+      <div class="text-primary-600 font-bold text-lg">£<span id="zoom-product-price"></span></div>
+    </div>
+    <div class="bg-white rounded-lg p-4 max-h-[90vh] overflow-hidden flex items-center justify-center">
+      <img id="zoom-image" class="max-w-full max-h-full object-contain" />
+    </div>
+  </div>
+</div>
