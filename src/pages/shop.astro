@@ -801,3 +801,24 @@ const breadcrumbItems = [
 
 <!-- Zoomable Image Viewer -->
 <ZoomableImageViewer src="" alt="" />
+
+<script>
+  // Bridge function to connect ProductCard quick view with ZoomableImageViewer
+  (window as any).openImageZoom = function(button: HTMLElement) {
+    const productName = button.dataset.productName;
+    const productImage = button.dataset.productImage;
+    const productDescription = button.dataset.productDescription;
+    const productPrice = parseFloat(button.dataset.productPrice || '0');
+
+    const productData = {
+      name: productName,
+      description: productDescription,
+      price: productPrice
+    };
+
+    // Use the ZoomableImageViewer's open function
+    if ((window as any).openZoomViewer) {
+      (window as any).openZoomViewer(productImage, productName, productData);
+    }
+  };
+</script>

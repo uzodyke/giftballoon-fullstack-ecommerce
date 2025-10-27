@@ -227,13 +227,13 @@ const { src, alt, product } = Astro.props;
 
   // Initialize when DOM is loaded
   document.addEventListener('DOMContentLoaded', () => {
-    window.zoomViewer = new ZoomableImageViewer();
+    (window as any).zoomViewer = new ZoomableImageViewer();
   });
 
   // Global function to open zoom viewer
-  window.openZoomViewer = function(src: string, alt: string, productData?: any) {
-    if (window.zoomViewer) {
-      window.zoomViewer.open(src, alt, productData);
+  (window as any).openZoomViewer = function(src: string, alt: string, productData?: any) {
+    if ((window as any).zoomViewer) {
+      (window as any).zoomViewer.open(src, alt, productData);
     }
   };
 </script>
