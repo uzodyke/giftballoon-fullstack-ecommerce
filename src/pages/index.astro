@@ -424,25 +424,50 @@ const featuredProducts = [products[1], products[7]]; // Luxury and Golden Treasu
 <script>
   // Simple zoom modal function
   function openImageZoom(button) {
-    const productName = button.dataset.productName;
-    const productImage = button.dataset.productImage;
-    const productDescription = button.dataset.productDescription;
-    const productPrice = button.dataset.productPrice;
+    console.log('openImageZoom called with:', button);
 
-    // Get the modal
-    const modal = document.getElementById('simple-zoom-modal');
+    try {
+      const productName = button.dataset.productName;
+      const productImage = button.dataset.productImage;
+      const productDescription = button.dataset.productDescription;
+      const productPrice = button.dataset.productPrice;
 
-    // Update modal content
-    document.getElementById('zoom-product-name').textContent = productName;
-    document.getElementById('zoom-product-description').textContent = productDescription;
-    document.getElementById('zoom-product-price').textContent = productPrice;
-    document.getElementById('zoom-image').src = productImage;
-    document.getElementById('zoom-image').alt = productName;
+      console.log('Product data:', { productName, productImage, productDescription, productPrice });
 
-    // Show modal
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    document.body.style.overflow = 'hidden';
+      // Get the modal
+      const modal = document.getElementById('simple-zoom-modal');
+      console.log('Modal element:', modal);
+
+      if (!modal) {
+        console.error('Modal not found!');
+        return;
+      }
+
+      // Update modal content
+      const nameEl = document.getElementById('zoom-product-name');
+      const descEl = document.getElementById('zoom-product-description');
+      const priceEl = document.getElementById('zoom-product-price');
+      const imageEl = document.getElementById('zoom-image');
+
+      console.log('Modal elements:', { nameEl, descEl, priceEl, imageEl });
+
+      if (nameEl) nameEl.textContent = productName;
+      if (descEl) descEl.textContent = productDescription;
+      if (priceEl) priceEl.textContent = productPrice;
+      if (imageEl) {
+        imageEl.src = productImage;
+        imageEl.alt = productName;
+      }
+
+      // Show modal
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+
+      console.log('Modal should now be visible');
+    } catch (error) {
+      console.error('Error in openImageZoom:', error);
+    }
   }
 
   // Make function globally available
