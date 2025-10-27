@@ -779,78 +779,84 @@ const breadcrumbItems = [
     document.getElementById('successModal').classList.add('flex');
   }
 
-  // Simple zoom modal function
-  function openImageZoom(button) {
-    console.log('openImageZoom called with:', button);
+  // Ensure DOM is loaded before setting up zoom functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Setting up zoom functionality on shop page...');
 
-    try {
-      const productName = button.dataset.productName;
-      const productImage = button.dataset.productImage;
-      const productDescription = button.dataset.productDescription;
-      const productPrice = button.dataset.productPrice;
+    // Simple zoom modal function
+    function openImageZoom(button) {
+      console.log('openImageZoom called with:', button);
 
-      console.log('Product data:', { productName, productImage, productDescription, productPrice });
+      try {
+        const productName = button.dataset.productName;
+        const productImage = button.dataset.productImage;
+        const productDescription = button.dataset.productDescription;
+        const productPrice = button.dataset.productPrice;
 
-      // Get the modal
-      const modal = document.getElementById('simple-zoom-modal');
-      console.log('Modal element:', modal);
+        console.log('Product data:', { productName, productImage, productDescription, productPrice });
 
-      if (!modal) {
-        console.error('Modal not found!');
-        return;
+        // Get the modal
+        const modal = document.getElementById('simple-zoom-modal');
+        console.log('Modal element:', modal);
+
+        if (!modal) {
+          console.error('Modal not found!');
+          return;
+        }
+
+        // Update modal content
+        const nameEl = document.getElementById('zoom-product-name');
+        const descEl = document.getElementById('zoom-product-description');
+        const priceEl = document.getElementById('zoom-product-price');
+        const imageEl = document.getElementById('zoom-image');
+
+        console.log('Modal elements:', { nameEl, descEl, priceEl, imageEl });
+
+        if (nameEl) nameEl.textContent = productName;
+        if (descEl) descEl.textContent = productDescription;
+        if (priceEl) priceEl.textContent = productPrice;
+        if (imageEl) {
+          imageEl.src = productImage;
+          imageEl.alt = productName;
+        }
+
+        // Show modal
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+
+        console.log('Modal should now be visible');
+      } catch (error) {
+        console.error('Error in openImageZoom:', error);
       }
-
-      // Update modal content
-      const nameEl = document.getElementById('zoom-product-name');
-      const descEl = document.getElementById('zoom-product-description');
-      const priceEl = document.getElementById('zoom-product-price');
-      const imageEl = document.getElementById('zoom-image');
-
-      console.log('Modal elements:', { nameEl, descEl, priceEl, imageEl });
-
-      if (nameEl) nameEl.textContent = productName;
-      if (descEl) descEl.textContent = productDescription;
-      if (priceEl) priceEl.textContent = productPrice;
-      if (imageEl) {
-        imageEl.src = productImage;
-        imageEl.alt = productName;
-      }
-
-      // Show modal
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      document.body.style.overflow = 'hidden';
-
-      console.log('Modal should now be visible');
-    } catch (error) {
-      console.error('Error in openImageZoom:', error);
     }
-  }
 
-  // Make function globally available
-  window.openImageZoom = openImageZoom;
+    // Make function globally available
+    window.openImageZoom = openImageZoom;
+    console.log('openImageZoom function set on window:', typeof window.openImageZoom);
 
-  // Set up close functionality
-  const modal = document.getElementById('simple-zoom-modal');
-  const closeBtn = document.getElementById('close-zoom');
+    // Set up close functionality
+    const modal = document.getElementById('simple-zoom-modal');
+    const closeBtn = document.getElementById('close-zoom');
 
-  if (closeBtn) {
-    closeBtn.addEventListener('click', function() {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      document.body.style.overflow = '';
-    });
-  }
-
-  if (modal) {
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) {
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
         document.body.style.overflow = '';
-      }
-    });
-  }
+      });
+    }
+
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          document.body.style.overflow = '';
+        }
+      });
+    }
+  });
 </script>
 
 <style>
