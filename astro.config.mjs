@@ -8,7 +8,7 @@ export default defineConfig({
   site: 'https://giftedballoon.com',
   output: 'hybrid',
   adapter: vercel({
-    runtime: 'nodejs22.x'
+    runtime: 'nodejs20.x'
   }),
   integrations: [
     sitemap({
