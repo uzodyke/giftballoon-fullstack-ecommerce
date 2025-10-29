@@ -28,6 +28,8 @@ const checkoutSchema = {
   schema={checkoutSchema}
   keywords="balloon checkout, secure payment, personalised balloon order, complete purchase"
 >
+  <!-- Load Stripe.js in head for better loading -->
+  <script src="https://js.stripe.com/v3/" slot="head"></script>
   <!-- Breadcrumb -->
   <Breadcrumb items={breadcrumbItems} />
 
@@ -257,18 +259,19 @@ const checkoutSchema = {
                     </label>
                   </div>
 
-                  <!-- PayPal -->
-                  <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
-                    <label class="flex items-center cursor-pointer">
+                  <!-- PayPal - Temporarily disabled -->
+                  <div class="border-2 border-gray-200 rounded-lg p-4 bg-gray-50 opacity-50">
+                    <label class="flex items-center cursor-not-allowed">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="paypal"
-                        class="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                        disabled
+                        class="w-4 h-4 text-gray-400"
                       />
-                      <span class="ml-3 font-semibold text-gray-900">PayPal</span>
+                      <span class="ml-3 font-semibold text-gray-500">PayPal (Coming Soon)</span>
                       <div class="ml-auto">
-                        <span class="text-blue-600 font-bold text-lg">PayPal</span>
+                        <span class="text-gray-400 font-bold text-lg">PayPal</span>
                       </div>
                     </label>
                   </div>
@@ -393,14 +396,11 @@ const checkoutSchema = {
   </div>
 </BaseLayout>
 
-<!-- Load Stripe.js -->
-<script src="https://js.stripe.com/v3/"></script>
-
 <!-- Load cart store -->
 <script src="/src/lib/cart-store.ts" type="module"></script>
 
-<!-- Load PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=sb&currency=GBP&components=buttons"></script>
+<!-- PayPal SDK temporarily disabled due to client ID issues -->
+<!-- <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=GBP&components=buttons"></script> -->
 
 <script define:vars={{ stripePublishableKey: stripeConfig.getPublishableKey() }}>
   // Global variables
@@ -412,20 +412,30 @@ const checkoutSchema = {
   let cart = [];
   let currentTotal = 0;
 
-  document.addEventListener('DOMContentLoaded', async function() {
-    // Wait for Stripe to load
-    if (typeof Stripe === 'undefined') {
-      console.log('Waiting for Stripe to load...');
-      // Wait a bit for Stripe script to load
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  // Function to wait for Stripe to load
+  async function waitForStripe(maxRetries = 10) {
+    for (let i = 0; i < maxRetries; i++) {
+      if (typeof Stripe !== 'undefined') {
+        return true;
+      }
+      console.log(`Waiting for Stripe to load... attempt ${i + 1}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
+    return false;
+  }
 
-    if (typeof Stripe !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', async function() {
+    console.log('DOM loaded, initializing checkout...');
+
+    // Wait for Stripe to load with retries
+    const stripeLoaded = await waitForStripe();
+
+    if (stripeLoaded) {
       // Initialize Stripe
       stripe = Stripe(stripePublishableKey);
       console.log('Stripe initialized successfully');
     } else {
-      console.error('Stripe failed to load');
+      console.error('Stripe failed to load after multiple attempts');
       showPaymentError('Payment system unavailable. Please refresh the page.');
       return;
     }
@@ -435,9 +445,7 @@ const checkoutSchema = {
     setupEventListeners();
     calculateTotals();
 
-    // Initialize PayPal (doesn't need payment intent)
-    initializePayPal();
-
+    // Note: PayPal temporarily disabled due to client ID issues
     // Note: Stripe elements will be initialized when user clicks Complete Order
     // This is because we need customer data to create the payment intent
   });
