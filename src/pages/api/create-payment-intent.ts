@@ -4,9 +4,8 @@ import { createServerClient } from '../../lib/supabase';
 
 export const prerender = false;
 
-// Use the corresponding secret key for the publishable key pk_live_51SKpFv3aMX7zUeKo8mV5qhPkf5J0BNO2n3clWZHrghRZYfs2DVibiKAObQpPhDckSM2EwjvZBZIY4keWr4z0lMI700lEg3qheC
-// Note: This is a placeholder - you need to replace with your actual secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE || 'sk_live_51SKpFv3aMX7zUeKo8YOUR_SECRET_KEY_HERE', {
+// Use Stripe secret key from environment variable
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE!, {
   apiVersion: '2024-10-28.acacia',
 });
 
