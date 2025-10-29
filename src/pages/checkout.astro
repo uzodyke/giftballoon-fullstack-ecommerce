@@ -560,7 +560,9 @@ const checkoutSchema = {
     console.log('Calculating totals for cart:', cart);
 
     const subtotal = cart.reduce((sum, item) => {
-      const price = item.totalPrice || (item.unitPrice || item.price || 0) * (item.quantity || 1);
+      // Fix price calculation by using the correct price field
+      const itemPrice = item.price || item.unitPrice || 0;
+      const price = item.totalPrice || itemPrice * (item.quantity || 1);
       console.log(`Item: ${item.name}, price: ${item.price}, unitPrice: ${item.unitPrice}, quantity: ${item.quantity}, calculated: ${price}`);
       return sum + price;
     }, 0);
