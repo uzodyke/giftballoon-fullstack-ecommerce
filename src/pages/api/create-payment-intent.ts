@@ -4,21 +4,26 @@ import { createServerClient } from '../../lib/supabase';
 
 export const prerender = false;
 
-// Use Stripe secret key - from environment variable
-const stripeKey = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY_LIVE;
-const isDevelopment = process.env.NODE_ENV === 'development';
-
-const stripe = new Stripe(stripeKey, {
-  apiVersion: '2024-10-28.acacia',
-});
-
 export const POST: APIRoute = async ({ request }) => {
   try {
+    // Use Stripe secret key - from environment variable
+    const stripeKey = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY_LIVE;
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
     console.log('Create payment intent API called');
     console.log('Environment:', {
       isDevelopment,
       hasStripeKey: !!stripeKey,
       stripeKeyPrefix: stripeKey?.substring(0, 10) + '...'
+    });
+
+    // Validate Stripe key exists first
+    if (!stripeKey || stripeKey.includes('Placeholder')) {
+      throw new Error('Stripe secret key not configured');
+    }
+
+    const stripe = new Stripe(stripeKey, {
+      apiVersion: '2024-10-28.acacia',
     });
 
     const body = await request.json();
@@ -43,11 +48,6 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Generate a simple order ID for now
     const orderId = 'GB-' + Date.now();
-
-    // Validate Stripe key exists
-    if (!stripeKey || stripeKey.includes('Placeholder')) {
-      throw new Error('Stripe secret key not configured');
-    }
 
     // Create Stripe payment intent with automatic payment methods
     const paymentIntent = await stripe.paymentIntents.create({
