@@ -618,8 +618,18 @@ const checkoutSchema = {
       });
 
       if (!paymentIntentResponse.ok) {
-        const errorData = await paymentIntentResponse.json();
-        throw new Error(errorData.error || 'Failed to create payment intent');
+        const errorText = await paymentIntentResponse.text();
+        console.error('Payment intent error response:', errorText);
+        console.error('Response status:', paymentIntentResponse.status);
+
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { error: errorText };
+        }
+
+        throw new Error(errorData.error || `API Error ${paymentIntentResponse.status}: ${errorText}`);
       }
 
       const { client_secret } = await paymentIntentResponse.json();

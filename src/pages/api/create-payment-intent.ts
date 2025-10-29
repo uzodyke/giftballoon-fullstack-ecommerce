@@ -17,6 +17,11 @@ const stripe = new Stripe(stripeKey, {
 export const POST: APIRoute = async ({ request }) => {
   try {
     console.log('Create payment intent API called');
+    console.log('Environment:', {
+      isDevelopment,
+      hasStripeKey: !!stripeKey,
+      stripeKeyPrefix: stripeKey?.substring(0, 10) + '...'
+    });
 
     const body = await request.json();
     const {
