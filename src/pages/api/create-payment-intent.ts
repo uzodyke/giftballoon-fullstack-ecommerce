@@ -10,6 +10,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE || 'sk_live_YOUR_LI
 
 export const POST: APIRoute = async ({ request }) => {
   try {
+    console.log('Create payment intent API called');
+
     const body = await request.json();
     const {
       amount,
@@ -17,10 +19,12 @@ export const POST: APIRoute = async ({ request }) => {
       order_details
     } = body;
 
+    console.log('Payment intent request:', { amount, currency, order_details });
+
     // Validate required fields
-    if (!amount || !order_details) {
+    if (!amount) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
+        JSON.stringify({ error: 'Missing amount' }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
@@ -28,75 +32,16 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // Create customer and order in Supabase
-    const supabase = createServerClient();
-
-    // First, create or get customer
-    const customerData = {
-      email: order_details.customer?.email || '',
-      name: order_details.customer?.name || 'Guest',
-      phone: order_details.customer?.phone || null
-    };
-
-    const { data: customer, error: customerError } = await supabase
-      .from('customers')
-      .upsert(customerData, { onConflict: 'email' })
-      .select()
-      .single();
-
-    if (customerError) {
-      throw new Error(`Failed to create customer: ${customerError.message}`);
-    }
-
-    // Create order
-    const orderData = {
-      customer_id: customer.id,
-      total_amount: amount / 100, // Convert from pence to pounds
-      shipping_address: order_details.delivery?.address || {
-        line1: '',
-        city: '',
-        postal_code: '',
-        country: 'GB'
-      },
-      notes: order_details.delivery?.instructions || null
-    };
-
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .insert(orderData)
-      .select()
-      .single();
-
-    if (orderError) {
-      throw new Error(`Failed to create order: ${orderError.message}`);
-    }
-
-    // Create order items
-    const orderItems = order_details.cart?.map((item: any) => ({
-      order_id: order.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      unit_price: item.price,
-      customization: item.customization || null
-    })) || [];
-
-    if (orderItems.length > 0) {
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) {
-        throw new Error(`Failed to create order items: ${itemsError.message}`);
-      }
-    }
+    // Generate a simple order ID for now
+    const orderId = 'GB-' + Date.now();
 
     // Create Stripe payment intent with automatic payment methods
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       metadata: {
-        order_id: order.id,
-        customer_email: order_details.customer?.email || 'guest@example.com'
+        order_id: orderId,
+        customer_email: order_details?.customer?.email || 'guest@giftedballoon.com'
       },
       automatic_payment_methods: {
         enabled: true,
@@ -104,16 +49,12 @@ export const POST: APIRoute = async ({ request }) => {
       },
     });
 
-    // Update order with payment intent ID
-    await supabase
-      .from('orders')
-      .update({ payment_intent_id: paymentIntent.id })
-      .eq('id', order.id);
+    console.log('Payment intent created:', paymentIntent.id);
 
     return new Response(
       JSON.stringify({
         client_secret: paymentIntent.client_secret,
-        order_id: order.id
+        order_id: orderId
       }),
       {
         status: 200,

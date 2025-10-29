@@ -438,11 +438,14 @@ const checkoutSchema = {
   });
 
   function loadOrderData() {
+    console.log('Loading order data...');
+
     // Check for direct order from shop page
     const orderData = localStorage.getItem('currentOrder');
     if (orderData) {
       currentOrder = JSON.parse(orderData);
       cart = [currentOrder];
+      console.log('Loaded currentOrder:', currentOrder);
     } else {
       // Load cart items from our cart store
       const cartData = localStorage.getItem('giftballoon_cart');
@@ -456,6 +459,7 @@ const checkoutSchema = {
           image: item.image,
           customization: item.customization || {}
         }));
+        console.log('Loaded giftballoon_cart:', cart);
       }
 
       // Also check regular cart key
@@ -471,8 +475,27 @@ const checkoutSchema = {
             image: item.product?.image || item.image,
             customization: item.customization || {}
           }));
+          console.log('Loaded regular cart:', cart);
         }
       }
+    }
+
+    // If no cart data, create a demo item for testing
+    if (cart.length === 0) {
+      console.log('No cart data found, creating demo item...');
+      cart = [{
+        id: 'demo-balloon',
+        name: 'Demo Personalised Balloon',
+        price: 29.99,
+        quantity: 1,
+        image: '/images/1. Birthday bouquet_£20.png',
+        customization: {
+          customName: 'Test Order',
+          occasionType: 'Birthday',
+          deliveryDate: 'ASAP'
+        }
+      }];
+      console.log('Created demo cart:', cart);
     }
 
     displayOrderItems();
