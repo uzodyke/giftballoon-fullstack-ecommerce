@@ -391,9 +391,9 @@ const breadcrumbItems = [
   <!-- Simple Zoom Modal -->
   <div id="simple-zoom-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden items-center justify-center p-4">
     <div class="relative max-w-4xl max-h-screen w-full">
-      <button id="close-zoom" class="absolute top-4 right-4 z-60 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full">
-        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      <button id="close-zoom" class="absolute top-4 right-4 z-60 bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-lg border-2 border-white">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
       <div class="absolute top-4 left-4 z-60 bg-white bg-opacity-95 rounded-lg p-4 max-w-md">
@@ -429,14 +429,19 @@ const breadcrumbItems = [
   let currentQuantity = 1;
 
   document.addEventListener('DOMContentLoaded', function() {
+    console.log('Shop page loaded, initializing...');
     initializeShop();
     setupEventListeners();
     updateDeliveryDateMin();
+
+    // Initialize pricing display
+    updatePricing();
 
     // Check for URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('product');
     if (productId && products[productId]) {
+      console.log('Loading product from URL:', productId);
       document.getElementById('productSelect').value = productId;
       selectProduct(productId);
     }
@@ -530,10 +535,15 @@ const breadcrumbItems = [
   }
 
   function selectProduct(productId) {
+    console.log('Selecting product:', productId);
     currentProduct = products[productId];
-    if (!currentProduct) return;
+    if (!currentProduct) {
+      console.error('Product not found:', productId);
+      return;
+    }
 
     basePrice = currentProduct.price;
+    console.log('Set base price to:', basePrice);
 
     // Show product display
     const productDisplay = document.getElementById('productDisplay');
@@ -583,6 +593,14 @@ const breadcrumbItems = [
   function updatePricing() {
     const unitPriceWithUpcharge = basePrice + styleUpcharge;
     const totalPrice = unitPriceWithUpcharge * currentQuantity;
+
+    console.log('Updating pricing:', {
+      basePrice,
+      styleUpcharge,
+      currentQuantity,
+      unitPriceWithUpcharge,
+      totalPrice
+    });
 
     document.getElementById('displayUnitPrice').textContent = `£${basePrice.toFixed(2)}`;
     document.getElementById('displayQuantity').textContent = currentQuantity;
