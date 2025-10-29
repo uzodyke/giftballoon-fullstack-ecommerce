@@ -400,7 +400,7 @@ const checkoutSchema = {
 <script src="/src/lib/cart-store.ts" type="module"></script>
 
 <!-- Load PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=Acgd4Q8DkEhEwPaWWg6Q4QwPSBLvXgJ3o4RXcFz7HrBKWq3IfO0r4DdJGF9Y6Og6Lv2HJI4Bs_-dFGHk&currency=GBP&components=buttons,payment-fields"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=sb&currency=GBP&components=buttons"></script>
 
 <script define:vars={{ stripePublishableKey: stripeConfig.getPublishableKey() }}>
   // Global variables
@@ -413,8 +413,22 @@ const checkoutSchema = {
   let currentTotal = 0;
 
   document.addEventListener('DOMContentLoaded', async function() {
-    // Initialize Stripe
-    stripe = Stripe(stripePublishableKey);
+    // Wait for Stripe to load
+    if (typeof Stripe === 'undefined') {
+      console.log('Waiting for Stripe to load...');
+      // Wait a bit for Stripe script to load
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    if (typeof Stripe !== 'undefined') {
+      // Initialize Stripe
+      stripe = Stripe(stripePublishableKey);
+      console.log('Stripe initialized successfully');
+    } else {
+      console.error('Stripe failed to load');
+      showPaymentError('Payment system unavailable. Please refresh the page.');
+      return;
+    }
 
     // Load order data and setup
     loadOrderData();
@@ -442,11 +456,27 @@ const checkoutSchema = {
         cart = storedCart.map(item => ({
           id: item.productId || item.id,
           name: item.name,
-          price: item.price,
-          quantity: item.quantity,
+          price: item.price || item.unitPrice || 0,
+          quantity: item.quantity || 1,
           image: item.image,
           customization: item.customization || {}
         }));
+      }
+
+      // Also check regular cart key
+      if (cart.length === 0) {
+        const regularCartData = localStorage.getItem('cart');
+        if (regularCartData) {
+          const storedCart = JSON.parse(regularCartData);
+          cart = storedCart.map(item => ({
+            id: item.productId || item.id,
+            name: item.product?.name || item.name,
+            price: item.unitPrice || item.price || 0,
+            quantity: item.quantity || 1,
+            image: item.product?.image || item.image,
+            customization: item.customization || {}
+          }));
+        }
       }
     }
 
@@ -491,8 +521,11 @@ const checkoutSchema = {
   }
 
   function calculateTotals() {
+    console.log('Calculating totals for cart:', cart);
+
     const subtotal = cart.reduce((sum, item) => {
       const price = item.totalPrice || (item.unitPrice || item.price || 0) * (item.quantity || 1);
+      console.log(`Item: ${item.name}, price: ${item.price}, unitPrice: ${item.unitPrice}, quantity: ${item.quantity}, calculated: ${price}`);
       return sum + price;
     }, 0);
 
@@ -500,6 +533,8 @@ const checkoutSchema = {
     const grandTotal = subtotal + deliveryFee;
 
     currentTotal = grandTotal;
+
+    console.log(`Subtotal: £${subtotal.toFixed(2)}, Delivery: £${deliveryFee.toFixed(2)}, Total: £${grandTotal.toFixed(2)}`);
 
     document.getElementById('subtotal').textContent = `£${subtotal.toFixed(2)}`;
     document.getElementById('deliveryFee').textContent = deliveryFee === 0 ? 'FREE' : `£${deliveryFee.toFixed(2)}`;
