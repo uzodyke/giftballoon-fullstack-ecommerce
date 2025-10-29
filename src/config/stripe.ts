@@ -16,6 +16,10 @@ export const stripeConfig = {
 
   // Get current publishable key
   getPublishableKey(): string {
+    // Try environment variable first, then fallback to hardcoded
+    if (typeof process !== 'undefined' && process.env?.PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+      return process.env.PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    }
     return this.publishableKey[this.environment];
   },
 
