@@ -4,7 +4,7 @@ import { createServerClient } from '../../lib/supabase';
 
 export const prerender = false;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE || 'sk_live_YOUR_LIVE_SECRET_KEY', {
   apiVersion: '2024-10-28.acacia',
 });
 

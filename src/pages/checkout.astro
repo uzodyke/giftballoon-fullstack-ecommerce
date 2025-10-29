@@ -421,9 +421,11 @@ const checkoutSchema = {
     setupEventListeners();
     calculateTotals();
 
-    // Initialize payment methods
-    await initializeStripeElements();
+    // Initialize PayPal (doesn't need payment intent)
     initializePayPal();
+
+    // Note: Stripe elements will be initialized when user clicks Complete Order
+    // This is because we need customer data to create the payment intent
   });
 
   function loadOrderData() {
@@ -506,13 +508,53 @@ const checkoutSchema = {
 
   async function initializeStripeElements() {
     try {
-      console.log('Initializing client-side Stripe Elements...');
+      console.log('Creating payment intent...');
 
-      // Client-side only approach - create elements without server payment intent
+      // Create payment intent on server with minimal data
+      const paymentIntentResponse = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: Math.round(currentTotal * 100), // Convert to pence
+          currency: 'gbp',
+          order_details: {
+            customer: {
+              name: 'Guest Customer',
+              email: 'guest@giftedballoon.com',
+              phone: ''
+            },
+            delivery: {
+              address: {
+                line1: '',
+                city: '',
+                postal_code: '',
+                country: 'GB'
+              },
+              instructions: ''
+            },
+            cart: cart.map(item => ({
+              product_id: item.id,
+              quantity: item.quantity || 1,
+              price: item.price || 0,
+              customization: item.customization || {}
+            }))
+          }
+        })
+      });
+
+      if (!paymentIntentResponse.ok) {
+        const errorData = await paymentIntentResponse.json();
+        throw new Error(errorData.error || 'Failed to create payment intent');
+      }
+
+      const { client_secret } = await paymentIntentResponse.json();
+      console.log('Payment intent created successfully');
+
+      // Create elements with payment intent
       elements = stripe.elements({
-        mode: 'payment',
-        amount: Math.round(currentTotal * 100), // Convert to pence
-        currency: 'gbp',
+        clientSecret: client_secret,
         appearance: {
           theme: 'stripe',
           variables: {
@@ -717,7 +759,7 @@ const checkoutSchema = {
   async function handleFormSubmit(event) {
     event.preventDefault();
 
-    if (!stripe || !elements) {
+    if (!stripe) {
       showPaymentError('Payment system not initialized. Please refresh and try again.');
       return;
     }
@@ -725,35 +767,41 @@ const checkoutSchema = {
     // Show loading state
     const submitButton = document.querySelector('button[type="submit"]');
     const originalText = submitButton.textContent;
-    submitButton.textContent = 'Processing...';
+    submitButton.textContent = 'Initializing Payment...';
     submitButton.disabled = true;
 
     try {
+      // Get selected payment method
+      const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+
+      if (selectedPaymentMethod === 'paypal') {
+        showPaymentError('Please use the PayPal button below to complete your payment.');
+        return;
+      } else if (selectedPaymentMethod === 'express') {
+        showPaymentError('Please use the Apple Pay or Google Pay button below to complete your payment.');
+        return;
+      }
+
+      // For card payments, initialize Stripe elements if not already done
+      if (!elements) {
+        submitButton.textContent = 'Creating Payment...';
+        await initializeStripeElements();
+      }
+
+      if (!elements) {
+        throw new Error('Failed to initialize payment system');
+      }
+
       // Get customer information
       const customerData = getCustomerData();
 
-      // Create order in Supabase first (client-side)
-      const orderData = {
-        customer_name: customerData.name,
-        customer_email: customerData.email,
-        customer_phone: customerData.phone,
-        delivery_address: customerData.address,
-        items: cart,
-        total_amount: currentTotal,
-        payment_status: 'pending',
-        status: 'pending',
-        created_at: new Date().toISOString()
-      };
-
-      // Store order locally for now (Supabase integration will be handled later)
-      const orderId = 'GB-' + Date.now();
-      localStorage.setItem('currentOrderData', JSON.stringify({ ...orderData, id: orderId }));
+      submitButton.textContent = 'Processing Payment...';
 
       // Submit payment with Stripe
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/order-confirmation?order_id=${orderId}`,
+          return_url: `${window.location.origin}/order-confirmation`,
           payment_method_data: {
             billing_details: {
               name: customerData.name,
@@ -785,16 +833,6 @@ const checkoutSchema = {
       // Reset button state
       submitButton.textContent = originalText;
       submitButton.disabled = false;
-    }
-
-    // Legacy code for other payment methods (kept for compatibility)
-    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-    if (selectedPaymentMethod === 'paypal') {
-      // PayPal handles its own submission
-      showPaymentError('Please use the PayPal button to complete your payment.');
-    } else if (selectedPaymentMethod === 'express') {
-      // Express checkout handles its own submission
-      showPaymentError('Please use the Apple Pay or Google Pay button to complete your payment.');
     }
   }
 
