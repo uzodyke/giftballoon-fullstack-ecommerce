@@ -393,16 +393,10 @@ const checkoutSchema = {
   </div>
 </BaseLayout>
 
-<!-- Load Stripe.js synchronously -->
-<script src="https://js.stripe.com/v3/"></script>
-
-<!-- Remove cart store module as it's causing 404 error -->
-<!-- <script src="/src/lib/cart-store.ts" type="module"></script> -->
-
 <!-- PayPal SDK with proper client ID -->
 <script src="https://www.paypal.com/sdk/js?client-id=AcBHq-iKQyHJNvA9NsflHJvUE1DsP84A4QV6gqjMOlKs9DQnE2s6J3Fl0EK4pQ4xaJ4HfQvhJPpK7-AE&currency=GBP&components=buttons"></script>
 
-<script define:vars={{ stripePublishableKey: stripeConfig.getPublishableKey() }}>
+<script define:vars={{ stripePublishableKey: stripeConfig.getPublishableKey() }} is:inline>
   // Global variables
   let stripe = null;
   let elements = null;
@@ -412,29 +406,53 @@ const checkoutSchema = {
   let cart = [];
   let currentTotal = 0;
 
+  // Load Stripe first
+  function loadStripe() {
+    return new Promise((resolve, reject) => {
+      if (typeof Stripe !== 'undefined') {
+        resolve(true);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.onload = () => {
+        console.log('Stripe script loaded');
+        resolve(true);
+      };
+      script.onerror = () => {
+        console.error('Failed to load Stripe');
+        reject(false);
+      };
+      document.head.appendChild(script);
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded, initializing checkout...');
 
-    // Check if Stripe is available
-    if (typeof Stripe !== 'undefined') {
+    try {
+      // Load Stripe first
+      await loadStripe();
+
+      // Initialize Stripe
       stripe = Stripe(stripePublishableKey);
       console.log('Stripe initialized successfully');
-    } else {
-      console.error('Stripe not available');
+
+      // Load order data and setup
+      loadOrderData();
+      setupEventListeners();
+      calculateTotals();
+
+      // Initialize PayPal
+      initializePayPal();
+
+      // Note: Stripe elements will be initialized when user clicks Complete Order
+      // This is because we need customer data to create the payment intent
+    } catch (error) {
+      console.error('Failed to initialize payment system:', error);
       showPaymentError('Payment system unavailable. Please refresh the page.');
-      return;
     }
-
-    // Load order data and setup
-    loadOrderData();
-    setupEventListeners();
-    calculateTotals();
-
-    // Initialize PayPal
-    initializePayPal();
-
-    // Note: Stripe elements will be initialized when user clicks Complete Order
-    // This is because we need customer data to create the payment intent
   });
 
   function loadOrderData() {
